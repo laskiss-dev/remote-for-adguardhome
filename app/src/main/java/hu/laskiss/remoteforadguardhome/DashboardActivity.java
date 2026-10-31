@@ -34,8 +34,20 @@ public class DashboardActivity extends BaseActivity {
         load();
     }
 
+    /** Melyik szerver adataival töltöttük be az oldalt; ha közben szervert váltottak, újratöltjük. */
+    private String loadedFor;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String now = Net.server == null ? null : Net.server.id;
+        if (loadedFor != null && now != null && !now.equals(loadedFor)) load();
+        showServer();
+    }
+
     @Override
     void load() {
+        loadedFor = Net.server == null ? null : Net.server.id;
         loading();
         task(() -> {
             Api a = Net.api;

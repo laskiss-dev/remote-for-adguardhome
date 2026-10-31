@@ -105,8 +105,8 @@ public abstract class BaseActivity extends Activity {
         super.onCreate(b);
         landscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (Net.api == null) {
-            String url = prefs.getString("url", "");
-            if (!url.isEmpty()) Net.api = new Api(url, prefs.getString("user", ""), prefs.getString("pass", ""));
+            Servers.Server s = Servers.active(prefs);
+            if (s != null) Servers.connect(s);
         }
         Net.top = this;
     }
@@ -215,7 +215,8 @@ public abstract class BaseActivity extends Activity {
     /** Háttérben futtat egy kérést; siker után a felületen folytatja, hiba esetén jelzi. */
     protected <T> void task(final Job<T> job, final Done<T> done) {
         if (Net.api == null) {
-            showServerDialog();
+            // A szerver kiválasztását / jelszókérést az oldal betöltése már feldobta.
+            setPageStatus("Nincs kiválasztott szerver. A ☰ menü Szerverek pontjában adhatsz meg egyet.", true);
             return;
         }
         Net.NET.execute(() -> {
@@ -274,7 +275,7 @@ public abstract class BaseActivity extends Activity {
         fil.add(0, NAV_RULES, 4, "Egyéni szűrési szabályok");
         m.add(0, NAV_LOG, 3, "Lekérdezési napló");
         addMenuItems(m);
-        m.add(1, NAV_SERVER, 20, "Szerver beállítása…");
+        m.add(1, NAV_SERVER, 20, "Szerverek");
         m.add(1, NAV_APPSET, 21, "Alkalmazás beállítások");
         m.add(1, NAV_INFO, 22, "Információ");
         pm.setOnMenuItemClickListener(item -> {
@@ -282,7 +283,7 @@ public abstract class BaseActivity extends Activity {
             if (id == 90 || id == 91) return false;
             if (onMenuItem(id)) return true;
             switch (id) {
-                case NAV_SERVER: showServerDialog(); return true;
+                case NAV_SERVER: open(ServersActivity.class, 0); return true;
                 case NAV_INFO: open(InfoActivity.class, 0); return true;
                 case NAV_APPSET: open(AppSettingsActivity.class, 0); return true;
                 case NAV_DASH: open(DashboardActivity.class, 0); return true;
@@ -386,50 +387,208 @@ public abstract class BaseActivity extends Activity {
     }
 
     protected void showServer() {
-        if (serverLabel != null) serverLabel.setText(Net.api == null ? "nincs szerver megadva" : Net.api.host);
+        if (serverLabel == null) return;
+        Servers.Server sv = Net.server;
+        serverLabel.setText(Net.api == null || sv == null ? "nincs szerver kiválasztva" : sv.label());
     }
 
+    /**
+     * Ha nincs kapcsolat: szerver nélkül az új szerver felvétele nyílik meg, mentett jelszó
+     * nélküli szervernél a jelszókérés, egyébként a Szerverek oldal.
+     */
     void showServerDialog() {
         if (isFinishing()) return;
+        Servers.Server active = Servers.active(prefs);
+        if (active == null) {
+            editServer(null);
+        } else if (Servers.password(active) == null) {
+            askPassword(active);
+        } else if (!(this instanceof ServersActivity)) {
+            open(ServersActivity.class, 0);
+        }
+    }
+
+    /** A szerver aktívvá tétele és a kapcsolat felépítése; minden oldal a nulláról töltődik. */
+    void activate(Servers.Server s) {
+        Servers.setActive(prefs, s.id);
+        Net.api = null;
+        Net.server = null;
+        Net.protection = null;
+        MainActivity.resetState();
+        if (!Servers.connect(s)) {
+            askPassword(s);
+            return;
+        }
+        showServer();
+        showProtection();
+        Net.loadProtection();
+        onServerChanged();
+    }
+
+    /** Jelszókérés olyan szervernél, ahol a jelszó nincs mentve (vagy nem olvasható vissza). */
+    void askPassword(final Servers.Server s) {
         LinearLayout f = col();
         f.setPadding(dp(22), dp(8), dp(22), 0);
-        final EditText url = field(f, "Szerver címe", "pl. 192.168.1.10:3000", prefs.getString("url", ""),
-                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-        final EditText user = field(f, "Felhasználónév", "", prefs.getString("user", ""),
-                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-        final EditText pass = field(f, "Jelszó", "", prefs.getString("pass", ""),
+        TextView who = text(s.label() + (s.user.isEmpty() ? "" : "\nFelhasználó: " + s.user), 14, SUB);
+        f.addView(who);
+        final EditText pass = field(f, "Jelszó", "", "",
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        final Switch save = switchRow(f, "Jelszó mentése", "Titkosítva tárolja ezen a telefonon.", s.savePass);
+        final AlertDialog d = new AlertDialog.Builder(this)
+                .setTitle("Jelszó szükséges")
+                .setView(f)
+                .setPositiveButton("Belépés", null)
+                .setNegativeButton("Szerverek", (x, w) -> { if (!(this instanceof ServersActivity)) open(ServersActivity.class, 0); })
+                .create();
+        d.setOnShowListener(x -> d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            List<Servers.Server> list = Servers.load(prefs);
+            Servers.Server cur = Servers.find(list, s.id);
+            if (cur == null) cur = s;
+            cur.savePass = save.isChecked();
+            Servers.setPassword(cur, pass.getText().toString());
+            Servers.save(prefs, list);
+            d.dismiss();
+            activate(cur);
+        }));
+        d.show();
+    }
+
+    /**
+     * Szerver felvétele (s == null) vagy szerkesztése: név, cím, HTTPS/HTTP, felhasználó, jelszó,
+     * jelszó mentése, kapcsolat tesztelése. HTTP nyilvános címre csak külön megerősítéssel.
+     */
+    void editServer(final Servers.Server orig) {
+        if (isFinishing()) return;
+        final boolean isNew = orig == null;
+        final Address cur = isNew ? null : orig.address();
+        LinearLayout f = col();
+        f.setPadding(dp(22), dp(8), dp(22), dp(8));
+        final EditText name = field(f, "Név", "pl. Otthon", isNew ? "" : orig.name, InputType.TYPE_CLASS_TEXT);
+        final EditText url = field(f, "Cím", "pl. 192.168.1.10:3000", cur == null ? (isNew ? "" : orig.url) : cur.display(),
+                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        final Choice proto = new Choice(f, "Kapcsolat", new String[]{"HTTPS (titkosított, ajánlott)", "HTTP (titkosítatlan)"},
+                cur == null || cur.https() ? 0 : 1);
+        final EditText user = field(f, "Felhasználónév", "", isNew ? "" : orig.user,
+                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        final boolean hadSaved = !isNew && orig.savePass && !orig.encPass.isEmpty();
+        final EditText pass = field(f, "Jelszó", hadSaved ? "(mentve – üresen változatlan marad)" : "", "",
+                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        final Switch save = switchRow(f, "Jelszó mentése",
+                "Titkosítva tárolja ezen a telefonon. Kikapcsolva az app minden indításkor kéri.",
+                isNew || orig.savePass);
         TextView note = text("A cím ugyanaz, amin a böngészőben a webes felületet megnyitod. "
-                + "Ha kívülről, sima http-n éred el, a jelszó titkosítatlanul megy át; otthoni hálózaton vagy VPN-en ez rendben van.", 12, MUTED);
+                + "HTTP-n a jelszó titkosítatlanul megy át; ezt az app csak otthoni címekre (pl. 192.168.x.x) "
+                + "engedi magától.", 12, MUTED);
         note.setPadding(0, dp(10), 0, 0);
         f.addView(note);
         ScrollView sv = new ScrollView(this);
         sv.addView(f);
         final AlertDialog d = new AlertDialog.Builder(this)
-                .setTitle("AdGuard Home szerver")
+                .setTitle(isNew ? "Új szerver" : "Szerver szerkesztése")
                 .setView(sv)
                 .setPositiveButton("Mentés", null)
+                .setNeutralButton("Kapcsolat tesztelése", null)
                 .setNegativeButton("Mégse", null)
                 .create();
-        d.setOnShowListener(x -> d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String u = url.getText().toString().trim();
-            if (u.isEmpty()) {
-                url.setError("Add meg a szerver címét");
-                return;
-            }
-            String us = user.getText().toString().trim();
-            String pw = pass.getText().toString();
-            prefs.edit().putString("url", u).putString("user", us).putString("pass", pw).apply();
-            Net.api = new Api(u, us, pw);
-            Net.protection = null;
-            MainActivity.resetState();
-            showServer();
-            showProtection();
-            Net.loadProtection();
-            onServerChanged();
-            d.dismiss();
-        }));
+        final boolean[] publicHttpOk = {!isNew && orig.allowPublicHttp};
+        d.setOnShowListener(x -> {
+            d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                final Address a = readAddress(url, proto);
+                if (a == null) return;
+                confirmHttp(a, publicHttpOk, () -> {
+                    List<Servers.Server> list = Servers.load(prefs);
+                    Servers.Server s = isNew ? new Servers.Server() : Servers.find(list, orig.id);
+                    if (s == null) s = new Servers.Server();
+                    String n = name.getText().toString().trim();
+                    s.name = n.isEmpty() ? a.host : n;
+                    s.url = a.base();
+                    s.allowPublicHttp = publicHttpOk[0] && !a.https() && !a.isLocal();
+                    String newUser = user.getText().toString().trim();
+                    boolean userChanged = !newUser.equals(s.user);
+                    s.user = newUser;
+                    String pw = pass.getText().toString();
+                    String keep = (pw.isEmpty() && !userChanged) ? Servers.password(s) : null;
+                    s.savePass = save.isChecked();
+                    Servers.setPassword(s, keep != null ? keep : pw);
+                    if (isNew || Servers.find(list, s.id) == null) list.add(s);
+                    Servers.save(prefs, list);
+                    d.dismiss();
+                    boolean isActive = Net.server == null || Net.server.id.equals(s.id) || isNew;
+                    if (isActive) activate(s);
+                    onServersChanged();
+                });
+            });
+            d.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v -> {
+                final Address a = readAddress(url, proto);
+                if (a == null) return;
+                confirmHttp(a, publicHttpOk, () -> {
+                    String pw = pass.getText().toString();
+                    if (pw.isEmpty() && !isNew) {
+                        String old = Servers.password(orig);
+                        if (old != null) pw = old;
+                    }
+                    final Api test = new Api(a, user.getText().toString().trim(), pw, publicHttpOk[0]);
+                    Toast.makeText(this, "Kapcsolódás…", Toast.LENGTH_SHORT).show();
+                    Net.NET.execute(() -> {
+                        String res;
+                        boolean ok;
+                        try {
+                            JSONObject st = test.getJson("status");
+                            res = "Sikeres kapcsolat.\nAdGuard Home " + st.optString("version", "?");
+                            ok = true;
+                        } catch (Exception e) {
+                            res = Net.msg(e);
+                            ok = false;
+                        }
+                        final String r = res;
+                        final boolean good = ok;
+                        Net.MAIN.post(() -> {
+                            if (isDestroyed()) return;
+                            new AlertDialog.Builder(this)
+                                    .setTitle(good ? "Kapcsolat rendben" : "Nem sikerült kapcsolódni")
+                                    .setMessage(r)
+                                    .setPositiveButton("Rendben", null)
+                                    .show();
+                        });
+                    });
+                });
+            });
+        });
         d.show();
+    }
+
+    /** A Szerverek oldal frissítése mentés után (más oldalakon nincs teendő). */
+    void onServersChanged() { }
+
+    private Address readAddress(EditText url, Choice proto) {
+        try {
+            Address a = Address.parse(url.getText().toString(), proto.sel == 0 ? "https" : "http");
+            // Ha a címbe írt séma eltér a választótól, a választót igazítjuk hozzá.
+            proto.set(a.https() ? 0 : 1);
+            return a;
+        } catch (Address.Invalid e) {
+            url.setError(e.getMessage());
+            return null;
+        }
+    }
+
+    /** Titkosítatlan HTTP nyilvános címre: csak kifejezett megerősítés után. */
+    private void confirmHttp(Address a, final boolean[] ok, final Runnable then) {
+        if (a.https() || a.isLocal() || ok[0]) {
+            then.run();
+            return;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Titkosítatlan kapcsolat")
+                .setMessage("A " + a.display() + " nem otthoni hálózati cím. HTTP-n a felhasználónév és a jelszó "
+                        + "titkosítatlanul menne át az interneten, amit bárki láthat, aki a forgalmat figyeli.\n\n"
+                        + "Ajánlott helyette HTTPS-t használni. Biztosan HTTP-vel akarsz kapcsolódni?")
+                .setPositiveButton("Igen, HTTP-vel", (x, w) -> {
+                    ok[0] = true;
+                    then.run();
+                })
+                .setNegativeButton("Mégse", null)
+                .show();
     }
 
     // ---------------------------------------------------------------- űrlap-segédek

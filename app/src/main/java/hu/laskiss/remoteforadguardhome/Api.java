@@ -20,15 +20,19 @@ final class Api {
 
     final String base;
     final String host;
+    final Address address;
     private final String auth;
+    private final boolean allowPublicHttp;
 
-    Api(String url, String user, String pass) {
-        String u = url.trim();
-        if (!u.startsWith("http://") && !u.startsWith("https://")) u = "http://" + u;
-        while (u.endsWith("/")) u = u.substring(0, u.length() - 1);
-        if (u.endsWith("/control")) u = u.substring(0, u.length() - 8);
-        base = u + "/control/";
-        host = u.replaceFirst("^https?://", "");
+    /**
+     * @param allowPublicHttp titkosítatlan HTTP nyilvános (nem otthoni) címre csak akkor megy,
+     *                        ha a felhasználó ezt a szerver beállításánál külön jóváhagyta.
+     */
+    Api(Address a, String user, String pass, boolean allowPublicHttp) {
+        this.address = a;
+        this.allowPublicHttp = allowPublicHttp;
+        base = a.apiBase();
+        host = a.display();
         if (user == null || user.isEmpty()) {
             auth = null;
         } else {
@@ -76,6 +80,11 @@ final class Api {
     }
 
     String request(String method, String path, String body, int readTimeout) throws IOException {
+        if (!address.https() && !address.isLocal() && !allowPublicHttp) {
+            // Védőháló: nyilvános címre jóváhagyás nélkül nem küldünk jelszót titkosítatlanul.
+            throw new IOException("Titkosítatlan (HTTP) kapcsolat nyilvános címre nincs engedélyezve. "
+                    + "Használj HTTPS-t, vagy engedélyezd a szerver beállításánál.");
+        }
         HttpURLConnection c = (HttpURLConnection) new URL(base + path).openConnection();
         try {
             c.setConnectTimeout(8000);
@@ -92,17 +101,23 @@ final class Api {
                 o.close();
             }
             int code = c.getResponseCode();
-            InputStream in = code >= 400 ? c.getErrorStream() : c.getInputStream();
-            String text = in == null ? "" : readAll(in);
-            if (code == 401 || code == 403 || (code >= 300 && code < 400)) {
-                throw new IOException("Hibás felhasználónév vagy jelszó (" + code + ")");
+            // Átirányítást nem követünk (a jelszó így nem juthat másik címre), és a szerver
+            // hibaszövegét sem jelenítjük meg: csak a kód és egy rövid magyarázat látszik.
+            if (code == 401 || code == 403) {
+                throw new IOException("Hibás felhasználónév vagy jelszó (" + code + ").");
+            }
+            if (code >= 300 && code < 400) {
+                throw new IOException("A szerver átirányított (" + code + "). Ellenőrizd a címet és a HTTP/HTTPS választást.");
+            }
+            if (code == 404) {
+                throw new IOException("A cím nem AdGuard Home szerverre mutat, vagy ezt a funkciót nem ismeri (404).");
             }
             if (code >= 400) {
-                String t = text.trim();
-                if (t.length() > 120) t = t.substring(0, 120);
-                throw new IOException("A szerver hibát jelzett: " + code + (t.isEmpty() ? "" : " – " + t));
+                InputStream err = c.getErrorStream();
+                if (err != null) err.close();
+                throw new IOException("A szerver hibát jelzett (" + code + ").");
             }
-            return text;
+            return readAll(c.getInputStream());
         } finally {
             c.disconnect();
         }

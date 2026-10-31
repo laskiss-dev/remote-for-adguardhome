@@ -12,6 +12,13 @@ public class InfoActivity extends BaseActivity {
 
     /** Változásnapló, a legújabb elöl: verzió, dátum, változások. */
     static final String[][] CHANGES = {
+            {"2.0", "2026. 10. 31.",
+                    "Több szerver: a ☰ menü Szerverek pontjában felvehetsz, szerkeszthetsz, törölhetsz és válthatsz",
+                    "Kapcsolat tesztelése a szerver beállításánál",
+                    "A jelszavak titkosítva tárolódnak (Android Keystore); a mentés szerverenként kikapcsolható",
+                    "HTTPS az alapértelmezett; titkosítatlan HTTP-t az app otthoni címekre enged, nyilvánosra csak megerősítés után",
+                    "A szervercím ellenőrzése, rövidebb és érthetőbb hibaüzenetek",
+                    "A fejlécben a szerver neve is látszik"},
             {"1.9.3", "2026. 10. 31.",
                     "Új név: Remote for AdGuard Home (korábban AdguardHome-remote)",
                     "Új alkalmazásazonosító és új aláírókulcs; a korábbi változat mellé külön appként települ"},
@@ -89,7 +96,8 @@ public class InfoActivity extends BaseActivity {
         app.addView(indep);
 
         final LinearLayout srv = section("Szerver", null);
-        kv(srv, "Cím", Net.api == null ? "nincs megadva" : Net.api.host);
+        kv(srv, "Név", Net.server == null ? "nincs kiválasztva" : Net.server.name);
+        kv(srv, "Cím", Net.api == null ? "–" : (Net.api.address.https() ? "https://" : "http://") + Net.api.host);
         final TextView ver = text("…", 14, TEXT);
         LinearLayout line = row();
         line.setPadding(0, dp(4), 0, dp(4));

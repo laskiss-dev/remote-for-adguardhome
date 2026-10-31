@@ -3,6 +3,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- A titkosítatlan HTTP-t az Android csak az egész appra tudja engedni, címtartományra nem.
+         Ezért a korlátozást az app kódja végzi (Api / Address): HTTP magától csak otthoni
+         hálózati címekre megy, nyilvános címre csak a felhasználó kifejezett jóváhagyásával. -->
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
@@ -29,6 +32,10 @@
         <activity
             android:name=".AppSettingsActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden" />
+        <activity
+            android:name=".ServersActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".InfoActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden" />

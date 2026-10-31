@@ -20,6 +20,8 @@ final class Net {
     static final ExecutorService NET = Executors.newSingleThreadExecutor();
 
     static Api api;
+    /** Az aktív szerver (név, cím, beállítások). */
+    static Servers.Server server;
     /** Az éppen előtérben lévő oldal (üzenetekhez, a BE/KI jelvényhez). */
     static BaseActivity top;
 
@@ -35,6 +37,13 @@ final class Net {
         if (e instanceof UnknownHostException) return "A szerver nem található.";
         if (e instanceof SocketTimeoutException) return "A szerver nem válaszolt időben.";
         if (e instanceof ConnectException) return "Nem sikerült kapcsolódni a szerverhez.";
+        if (e instanceof javax.net.ssl.SSLHandshakeException) {
+            return "A szerver HTTPS-tanúsítványa nem megbízható, vagy nem ehhez a címhez szól. "
+                    + "Az app ilyenkor biztonsági okból nem kapcsolódik.";
+        }
+        if (e instanceof javax.net.ssl.SSLException) {
+            return "Nem sikerült titkosított (HTTPS) kapcsolatot létesíteni. Lehet, hogy a szerver ezen a porton csak HTTP-t használ.";
+        }
         String m = e.getMessage();
         return m == null ? e.getClass().getSimpleName() : m;
     }
