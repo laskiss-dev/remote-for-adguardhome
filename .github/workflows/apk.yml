@@ -1,0 +1,64 @@
+name: APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+    steps:
+      - name: Aláírókulcs ellenőrzése
+        id: key
+        run: |
+          if [ -z "$KEYSTORE_B64" ] || [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::warning::Hiányzik a RELEASE_KEYSTORE_B64 vagy a RELEASE_KEYSTORE_PASSWORD a repó Secrets beállításai közül, ezért most nem készül APK."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.key.outputs.ok == 'true'
+      - uses: actions/setup-java@v4
+        if: steps.key.outputs.ok == 'true'
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        if: steps.key.outputs.ok == 'true'
+        with:
+          gradle-version: '8.14.3'
+      - name: Fordítás
+        if: steps.key.outputs.ok == 'true'
+        run: |
+          KS="$RUNNER_TEMP/release.jks"
+          echo "$KEYSTORE_B64" | tr -d ' \r\n\t' | base64 -d > "$KS"
+          export RELEASE_KEYSTORE="$KS"
+          export RELEASE_KEYSTORE_PASSWORD="$KEYSTORE_PASSWORD"
+          export RELEASE_KEY_PASSWORD="$KEYSTORE_PASSWORD"
+          export RELEASE_KEY_ALIAS=remoteforadguardhome
+          gradle assembleRelease --no-daemon
+          rm -f "$KS"
+      - uses: actions/upload-artifact@v4
+        if: steps.key.outputs.ok == 'true'
+        with:
+          name: Remote-for-AdGuard-Home
+          path: app/build/outputs/apk/release/*.apk
+      - name: Release
+        if: steps.key.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VER=$(grep -oP "versionName '\K[^']+" app/build.gradle)
+          APK=app/build/outputs/apk/release/Remote-for-AdGuard-Home-$VER.apk
+          MSG=$(git log -1 --format=%B | grep -v -e '^Co-Authored-By' -e '^Claude-Session')
+          if gh release view "v$VER" >/dev/null 2>&1; then
+            gh release upload "v$VER" "$APK" --clobber
+            gh release edit "v$VER" --notes "$MSG"
+          else
+            gh release create "v$VER" "$APK" --title "Remote for AdGuard Home $VER" --notes "$MSG" --target "$GITHUB_SHA"
+          fi

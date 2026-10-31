@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Tema" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/hatter</item>
+        <item name="android:statusBarColor">#1A1A1A</item>
+        <item name="android:navigationBarColor">#1A1A1A</item>
+        <item name="android:colorAccent">#67B279</item>
+        <item name="android:colorPrimary">#1A1A1A</item>
+    </style>
+    <style name="TemaVilagos" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/hatter_vilagos</item>
+        <item name="android:statusBarColor">#F4F5F7</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">#F4F5F7</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:colorAccent">#3F8F55</item>
+        <item name="android:colorPrimary">#F4F5F7</item>
+    </style>
+</resources>

@@ -1,0 +1,12 @@
+# Fordítási kimenet
+.gradle/
+build/
+app/build/
+local.properties
+.idea/
+*.iml
+
+# Aláírókulcsok és titkos adatok soha ne kerüljenek a repóba
+*.jks
+*.keystore
+keystore.properties

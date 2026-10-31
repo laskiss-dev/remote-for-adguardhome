@@ -1,0 +1,54 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'hu.laskiss.remoteforadguardhome'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'hu.laskiss.remoteforadguardhome'
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName '1.9.3'
+    }
+
+    // Az aláírókulcs nincs a repóban. A GitHub Actions a titkos beállításokból (Secrets)
+    // állítja elő a fordítás idejére; helyi fordításnál a környezeti változókból olvassa.
+    def ksFile = System.getenv('RELEASE_KEYSTORE')
+    signingConfigs {
+        release {
+            if (ksFile) {
+                storeFile file(ksFile)
+                storePassword System.getenv('RELEASE_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('RELEASE_KEY_ALIAS')
+                keyPassword System.getenv('RELEASE_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (ksFile) signingConfig signingConfigs.release
+        }
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
+    // A kész APK neve: Remote-for-AdGuard-Home-<verzió>.apk
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "Remote-for-AdGuard-Home-${variant.versionName}.apk"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
