@@ -288,11 +288,12 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
-     * Rövid csippanás, ha a frissítés új sorokat hozott. Az értesítési hangerőt követi,
+     * Rövid csippanás, amikor új zöld (kiemelt) sorok jelennek meg: csak ha a frissítés új sorokat
+     * hozott, és az „Új sorok kiemelése” be van kapcsolva. Az értesítési hangerőt követi,
      * így néma vagy rezgő módban nem szól. Engedély nem kell hozzá.
      */
     static void beep() {
-        if (!beepNew || current == null || !current.resumed) return;
+        if (!beepNew || !markNew || current == null || !current.resumed) return;
         try {
             final android.media.ToneGenerator tg =
                     new android.media.ToneGenerator(android.media.AudioManager.STREAM_NOTIFICATION, 60);
@@ -785,9 +786,10 @@ public class MainActivity extends BaseActivity {
         MenuItem mk = m.add(1, 104, 12, "Új sorok kiemelése");
         mk.setCheckable(true);
         mk.setChecked(markNew);
-        MenuItem bp = m.add(1, 105, 13, "Hangjelzés új soroknál");
+        MenuItem bp = m.add(1, 105, 13, "Hangjelzés zöld soroknál");
         bp.setCheckable(true);
         bp.setChecked(beepNew);
+        bp.setEnabled(markNew);
         m.add(1, 103, 14, "Teljes újratöltés");
     }
 
@@ -804,7 +806,7 @@ public class MainActivity extends BaseActivity {
             case 105:
                 beepNew = !beepNew;
                 prefs.edit().putBoolean("beepNew", beepNew).apply();
-                if (beepNew) beep();
+                if (beepNew && markNew) beep();
                 return true;
             case 104:
                 markNew = !markNew;
