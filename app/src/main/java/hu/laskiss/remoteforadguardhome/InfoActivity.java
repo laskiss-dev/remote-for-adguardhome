@@ -12,6 +12,9 @@ public class InfoActivity extends BaseActivity {
 
     /** Változásnapló, a legújabb elöl: verzió, dátum, változások. */
     static final String[][] CHANGES = {
+            {"2.2", "2026. 11. 01.",
+                    "Lekérdezési napló: a sor hosszú nyomására megjelenő menüben új pont: Megnyitás külső böngészőben",
+                    "A domaint https:// címként a telefon alapértelmezett böngészője nyitja meg"},
             {"2.1", "2026. 11. 01.",
                     "Lekérdezési napló: rövid hangjelzés, amikor új zöld (kiemelt) sorok jelennek meg",
                     "A ☰ menüben kikapcsolható; ha az új sorok kiemelése ki van kapcsolva, a hangjelzés sem szól"},

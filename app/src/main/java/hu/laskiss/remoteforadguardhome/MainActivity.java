@@ -1,6 +1,7 @@
 package hu.laskiss.remoteforadguardhome;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -8,6 +9,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -867,7 +869,8 @@ public class MainActivity extends BaseActivity {
         m.add(0, 2, 1, "Csak ez a kliens");
         m.add(0, 3, 2, "Csak ez a domain");
         m.add(0, 4, 3, "Domain másolása");
-        m.add(0, 5, 4, "Részletek");
+        if (webDomain(e) != null) m.add(0, 6, 4, "Megnyitás külső böngészőben");
+        m.add(0, 5, 5, "Részletek");
         pm.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case 1: confirmRule(e); break;
@@ -875,11 +878,34 @@ public class MainActivity extends BaseActivity {
                 case 3: filterDomain(e); break;
                 case 4: copyDomain(e); break;
                 case 5: detailDialog(e); break;
+                case 6: openInBrowser(e); break;
                 default: return false;
             }
             return true;
         });
         pm.show();
+    }
+
+    /** A domain, ha weboldalként megnyitható név (nem IP-visszakeresés, nem üres); különben null. */
+    static String webDomain(Entry e) {
+        String d = e.domain == null ? "" : e.domain.trim().toLowerCase(java.util.Locale.ROOT);
+        if (d.isEmpty() || d.endsWith(".arpa") || d.indexOf('.') < 0) return null;
+        if (!d.matches("[a-z0-9_]([a-z0-9_-]*[a-z0-9_])?(\\.[a-z0-9_]([a-z0-9_-]*[a-z0-9_])?)+")) return null;
+        return d;
+    }
+
+    /** A domain megnyitása a telefon alapértelmezett böngészőjében (https://domain). */
+    private void openInBrowser(Entry e) {
+        String d = webDomain(e);
+        if (d == null) return;
+        Uri uri = new Uri.Builder().scheme("https").authority(d).path("/").build();
+        Intent i = new Intent(Intent.ACTION_VIEW, uri);
+        i.addCategory(Intent.CATEGORY_BROWSABLE);
+        try {
+            startActivity(i);
+        } catch (ActivityNotFoundException ex) {
+            Toast.makeText(this, "Nincs böngésző a telefonon.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void detailDialog(Entry e) {
