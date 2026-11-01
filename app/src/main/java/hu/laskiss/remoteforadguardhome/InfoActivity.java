@@ -12,6 +12,8 @@ public class InfoActivity extends BaseActivity {
 
     /** Változásnapló, a legújabb elöl: verzió, dátum, változások. */
     static final String[][] CHANGES = {
+            {"2.1", "2026. 11. 01.",
+                    "Lekérdezési napló: rövid hangjelzés, ha a frissítés új sorokat hozott (a ☰ menüben kikapcsolható)"},
             {"2.0", "2026. 10. 31.",
                     "Több szerver: a ☰ menü Szerverek pontjában felvehetsz, szerkeszthetsz, törölhetsz és válthatsz",
                     "Kapcsolat tesztelése a szerver beállításánál",

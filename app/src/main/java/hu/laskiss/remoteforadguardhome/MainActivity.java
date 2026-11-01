@@ -78,7 +78,7 @@ public class MainActivity extends BaseActivity {
     static String oldest = "", search = "", expandedKey = null, status = "";
     static int filterIdx = 0, gen = 0, interval = 10;
     static boolean more = false, busy = false, loadingMore = false, statusError = false, loadedOnce = false;
-    static boolean showSub = false, markNew = true;
+    static boolean showSub = false, markNew = true, beepNew = true;
     /** A legutóbbi frissítéssel érkezett sorok, ezek ideje és domainje zöld. */
     static final HashSet<String> freshKeys = new HashSet<>();
 
@@ -109,6 +109,7 @@ public class MainActivity extends BaseActivity {
         interval = prefs.getInt("interval", 10);
         showSub = prefs.getBoolean("showSub", false);
         markNew = prefs.getBoolean("markNew", true);
+        beepNew = prefs.getBoolean("beepNew", true);
         current = this;
         // A menüből nyitva (nem forgatás, nem keresés az Irányítópultról) a napló mindig szűretlenül indul.
         Intent in = getIntent();
@@ -270,11 +271,13 @@ public class MainActivity extends BaseActivity {
                         oldest = old;
                         more = !old.isEmpty();
                         if (m != null) m.renderList(0, true);
+                        beep();
                     } else if (!fresh.isEmpty()) {
                         add(fresh, true);
                         freshKeys.clear();
                         for (Entry e : fresh) freshKeys.add(e.key);
                         if (m != null) m.renderList(fresh.size(), false);
+                        beep();
                     }
                     okStatus();
                 });
@@ -282,6 +285,22 @@ public class MainActivity extends BaseActivity {
                 fail(g, e);
             }
         });
+    }
+
+    /**
+     * Rövid csippanás, ha a frissítés új sorokat hozott. Az értesítési hangerőt követi,
+     * így néma vagy rezgő módban nem szól. Engedély nem kell hozzá.
+     */
+    static void beep() {
+        if (!beepNew || current == null || !current.resumed) return;
+        try {
+            final android.media.ToneGenerator tg =
+                    new android.media.ToneGenerator(android.media.AudioManager.STREAM_NOTIFICATION, 60);
+            tg.startTone(android.media.ToneGenerator.TONE_PROP_BEEP, 120);
+            MAIN.postDelayed(tg::release, 400);
+        } catch (RuntimeException ignored) {
+            // ha a hang épp nem elérhető, egyszerűen kimarad
+        }
     }
 
     static void loadMore() {
@@ -766,7 +785,10 @@ public class MainActivity extends BaseActivity {
         MenuItem mk = m.add(1, 104, 12, "Új sorok kiemelése");
         mk.setCheckable(true);
         mk.setChecked(markNew);
-        m.add(1, 103, 13, "Teljes újratöltés");
+        MenuItem bp = m.add(1, 105, 13, "Hangjelzés új soroknál");
+        bp.setCheckable(true);
+        bp.setChecked(beepNew);
+        m.add(1, 103, 14, "Teljes újratöltés");
     }
 
     @Override
@@ -779,6 +801,11 @@ public class MainActivity extends BaseActivity {
                 if (adapter != null) adapter.notifyDataSetChanged();
                 return true;
             case 103: startFresh(); return true;
+            case 105:
+                beepNew = !beepNew;
+                prefs.edit().putBoolean("beepNew", beepNew).apply();
+                if (beepNew) beep();
+                return true;
             case 104:
                 markNew = !markNew;
                 prefs.edit().putBoolean("markNew", markNew).apply();
