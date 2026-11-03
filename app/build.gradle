@@ -10,8 +10,8 @@ android {
         applicationId 'hu.laskiss.remoteforadguardhome'
         minSdk 26
         targetSdk 34
-        versionCode 5
-        versionName '2.2'
+        versionCode 6
+        versionName '2.3'
     }
 
     // Az aláírókulcs nincs a repóban. A GitHub Actions a titkos beállításokból (Secrets)

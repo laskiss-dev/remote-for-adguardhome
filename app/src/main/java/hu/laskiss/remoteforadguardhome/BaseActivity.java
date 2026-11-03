@@ -84,8 +84,8 @@ public abstract class BaseActivity extends Activity {
     private boolean createdLight;
 
     // Menüpontok azonosítói
-    static final int NAV_DASH = 1, NAV_LOG = 2, NAV_SERVER = 3, NAV_INFO = 4, NAV_APPSET = 5,
-            NAV_GENERAL = 10, NAV_CLIENTS = 11, NAV_DNS = 12, NAV_DHCP = 13,
+    static final int NAV_DASH = 1, NAV_LOG = 2, NAV_SERVER = 3, NAV_INFO = 4, NAV_APPSET = 5, NAV_GUIDE = 6,
+            NAV_GENERAL = 10, NAV_CLIENTS = 11, NAV_DNS = 12, NAV_DHCP = 13, NAV_TLS = 14,
             NAV_BLOCKLISTS = 20, NAV_ALLOWLISTS = 21, NAV_REWRITES = 22, NAV_SERVICES = 23, NAV_RULES = 24;
 
     protected boolean landscape;
@@ -265,8 +265,9 @@ public abstract class BaseActivity extends Activity {
         SubMenu set = m.addSubMenu(0, 90, 1, "Beállítások");
         set.add(0, NAV_GENERAL, 0, "Általános beállítások");
         set.add(0, NAV_DNS, 1, "DNS beállítások");
-        set.add(0, NAV_CLIENTS, 2, "Kliens beállítások");
-        set.add(0, NAV_DHCP, 3, "DHCP beállítások");
+        set.add(0, NAV_TLS, 2, "Titkosítási beállítások");
+        set.add(0, NAV_CLIENTS, 3, "Kliens beállítások");
+        set.add(0, NAV_DHCP, 4, "DHCP beállítások");
         SubMenu fil = m.addSubMenu(0, 91, 2, "Szűrők");
         fil.add(0, NAV_BLOCKLISTS, 0, "DNS blokkolási listák");
         fil.add(0, NAV_ALLOWLISTS, 1, "DNS engedélyezési listák");
@@ -274,6 +275,7 @@ public abstract class BaseActivity extends Activity {
         fil.add(0, NAV_SERVICES, 3, "Blokkolt szolgáltatások");
         fil.add(0, NAV_RULES, 4, "Egyéni szűrési szabályok");
         m.add(0, NAV_LOG, 3, "Lekérdezési napló");
+        m.add(0, NAV_GUIDE, 4, "Beállítási útmutató");
         addMenuItems(m);
         m.add(1, NAV_SERVER, 20, "Szerverek");
         m.add(1, NAV_APPSET, 21, "Alkalmazás beállítások");
@@ -292,6 +294,8 @@ public abstract class BaseActivity extends Activity {
                 case NAV_CLIENTS: open(ClientsActivity.class, 0); return true;
                 case NAV_DNS: open(DnsActivity.class, 0); return true;
                 case NAV_DHCP: open(DhcpActivity.class, 0); return true;
+                case NAV_TLS: open(EncryptionActivity.class, 0); return true;
+                case NAV_GUIDE: open(GuideActivity.class, 0); return true;
                 case NAV_BLOCKLISTS: open(FilterListsActivity.class, 0); return true;
                 case NAV_ALLOWLISTS: open(FilterListsActivity.class, 1); return true;
                 case NAV_REWRITES: open(RewritesActivity.class, 0); return true;

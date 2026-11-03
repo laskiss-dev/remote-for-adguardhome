@@ -114,12 +114,35 @@ final class Api {
             }
             if (code >= 400) {
                 InputStream err = c.getErrorStream();
+                String detail = code == 400 && path.startsWith("tls/") ? shortError(err) : null;
                 if (err != null) err.close();
-                throw new IOException("A szerver hibát jelzett (" + code + ").");
+                throw new IOException("A szerver hibát jelzett (" + code + ")."
+                        + (detail == null ? "" : "\n" + detail));
             }
             return readAll(c.getInputStream());
         } finally {
             c.disconnect();
+        }
+    }
+
+    /**
+     * A titkosítási beállításoknál a szerver hibaüzenete (pl. „a port foglalt”) segít javítani a hibát,
+     * ezért ott megjelenítjük: csak az első sort, vezérlőkarakterek nélkül, legfeljebb 200 karakterben.
+     */
+    static String shortError(InputStream err) {
+        if (err == null) return null;
+        try {
+            byte[] buf = new byte[1024];
+            int n = 0, r;
+            while (n < buf.length && (r = err.read(buf, n, buf.length - n)) > 0) n += r;
+            String t = new String(buf, 0, n, StandardCharsets.UTF_8);
+            int nl = t.indexOf('\n');
+            if (nl >= 0) t = t.substring(0, nl);
+            t = t.replaceAll("[\\p{Cntrl}]", " ").trim();
+            if (t.length() > 200) t = t.substring(0, 200) + "…";
+            return t.isEmpty() ? null : t;
+        } catch (IOException e) {
+            return null;
         }
     }
 

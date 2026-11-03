@@ -12,6 +12,10 @@ public class InfoActivity extends BaseActivity {
 
     /** Változásnapló, a legújabb elöl: verzió, dátum, változások. */
     static final String[][] CHANGES = {
+            {"2.3", "2026. 11. 03.",
+                    "A menü felépítése most teljesen megegyezik az AdGuard Home webes felületével",
+                    "Új: Beállítások → Titkosítási beállítások (HTTPS, DNS-over-HTTPS/TLS/QUIC, tanúsítvány és privát kulcs, ellenőrzéssel)",
+                    "Új: Beállítási útmutató a szerver DNS-címeivel és eszközönkénti lépésekkel (Router, Windows, macOS, Android, iOS, DNS adatvédelem)"},
             {"2.2", "2026. 11. 01.",
                     "Lekérdezési napló: a sor hosszú nyomására megjelenő menüben új pont: Megnyitás külső böngészőben",
                     "A domaint https:// címként a telefon alapértelmezett böngészője nyitja meg"},
