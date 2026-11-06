@@ -42,11 +42,11 @@ public class AppSettingsActivity extends BaseActivity {
         });
 
         LinearLayout upd = section("Frissítések",
-                "Telepített verzió: " + Updater.currentVersionName(this) + ". Az új verziókat a GitHubról "
-                        + "(" + Updater.REPO + ") tölti le; telepítés előtt ellenőrzi, hogy sértetlen és "
-                        + "ugyanazzal a kulccsal van aláírva, mint ez az app.");
+                "Telepített verzió: " + Updater.currentVersionName(this) + ". Az új verziók a GitHubon "
+                        + "(" + Updater.REPO + ") jelennek meg; a letöltés a böngészőben történik, a telepítést "
+                        + "a letöltött fájlra koppintva indítod.");
         Switch auto = switchRow(upd, "Frissítések automatikus keresése",
-                "Induláskor, legfeljebb 6 óránként megnézi, van-e új verzió, és ha van, megkérdezi, telepítsd-e.",
+                "Induláskor, legfeljebb 6 óránként megnézi, van-e új verzió, és ha van, megmutatja az újdonságokat.",
                 prefs.getBoolean(Updater.PREF_AUTO, true));
         auto.setOnCheckedChangeListener((v, on) -> prefs.edit().putBoolean(Updater.PREF_AUTO, on).apply());
         button(buttonRow(upd), "Frissítés keresése most", 1, v -> Updater.manualCheck(this, prefs));
