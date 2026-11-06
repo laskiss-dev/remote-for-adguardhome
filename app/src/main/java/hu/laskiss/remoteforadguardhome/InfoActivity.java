@@ -12,6 +12,8 @@ public class InfoActivity extends BaseActivity {
 
     /** Változásnapló, a legújabb elöl: verzió, dátum, változások. */
     static final String[][] CHANGES = {
+            {"2.4.2", "2026. 11. 06.",
+                    "Az automatikus frissítéskeresés naponta legfeljebb egyszer fut (eddig 6 óránként)"},
             {"2.4.1", "2026. 11. 06.",
                     "Frissítés: az app már nem telepít magától, így a Google Play Protect nem jelöli kártékonynak",
                     "Új verziónál a Letöltés gomb a böngészőben tölti le a fájlt; a telepítéshez koppints a letöltött fájlra"},

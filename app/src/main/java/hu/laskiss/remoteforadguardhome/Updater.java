@@ -45,7 +45,7 @@ final class Updater {
     static final String PREF_LAST = "updLast";
     static final String PREF_SKIP = "updSkip";
     /** Automatikus keresés legfeljebb ilyen gyakran. */
-    static final long AUTO_INTERVAL_MS = 6L * 60 * 60 * 1000;
+    static final long AUTO_INTERVAL_MS = 24L * 60 * 60 * 1000;
     static final int MAX_INDEX_BYTES = 64 * 1024;
     static final long MAX_APK_BYTES = 200L * 1024 * 1024;
 

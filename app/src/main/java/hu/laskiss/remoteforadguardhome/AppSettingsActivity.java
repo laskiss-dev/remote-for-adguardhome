@@ -46,7 +46,7 @@ public class AppSettingsActivity extends BaseActivity {
                         + "(" + Updater.REPO + ") jelennek meg; a letöltés a böngészőben történik, a telepítést "
                         + "a letöltött fájlra koppintva indítod.");
         Switch auto = switchRow(upd, "Frissítések automatikus keresése",
-                "Induláskor, legfeljebb 6 óránként megnézi, van-e új verzió, és ha van, megmutatja az újdonságokat.",
+                "Induláskor, naponta legfeljebb egyszer megnézi, van-e új verzió, és ha van, megmutatja az újdonságokat.",
                 prefs.getBoolean(Updater.PREF_AUTO, true));
         auto.setOnCheckedChangeListener((v, on) -> prefs.edit().putBoolean(Updater.PREF_AUTO, on).apply());
         button(buttonRow(upd), "Frissítés keresése most", 1, v -> Updater.manualCheck(this, prefs));
