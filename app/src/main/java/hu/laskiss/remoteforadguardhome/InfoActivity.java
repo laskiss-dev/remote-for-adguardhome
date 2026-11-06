@@ -12,6 +12,9 @@ public class InfoActivity extends BaseActivity {
 
     /** Változásnapló, a legújabb elöl: verzió, dátum, változások. */
     static final String[][] CHANGES = {
+            {"2.4.3", "2026. 11. 06.",
+                    "A frissítés ismét az appból települ a Telepítés gombbal, böngésző nélkül",
+                    "Android 12-től külön jóváhagyó ablak nélkül frissül, ha a telefon engedi"},
             {"2.4.2", "2026. 11. 06.",
                     "Az automatikus frissítéskeresés naponta legfeljebb egyszer fut (eddig 6 óránként)"},
             {"2.4.1", "2026. 11. 06.",
