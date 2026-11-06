@@ -12,6 +12,10 @@ public class InfoActivity extends BaseActivity {
 
     /** Változásnapló, a legújabb elöl: verzió, dátum, változások. */
     static final String[][] CHANGES = {
+            {"2.4", "2026. 11. 06.",
+                    "Új: frissítés az appon belül – induláskor megnézi, van-e új verzió, és ha van, megkérdezi, telepítsd-e",
+                    "Telepítés előtt ellenőrzi, hogy a letöltött fájl sértetlen és ugyanazzal a kulccsal van aláírva",
+                    "Alkalmazás beállítások → Frissítések: automatikus keresés ki/be, Frissítés keresése most"},
             {"2.3", "2026. 11. 03.",
                     "A menü felépítése most teljesen megegyezik az AdGuard Home webes felületével",
                     "Új: Beállítások → Titkosítási beállítások (HTTPS, DNS-over-HTTPS/TLS/QUIC, tanúsítvány és privát kulcs, ellenőrzéssel)",

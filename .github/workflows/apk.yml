@@ -62,3 +62,38 @@ jobs:
           else
             gh release create "v$VER" "$APK" --title "Remote for AdGuard Home $VER" --notes "$MSG" --target "$GITHUB_SHA"
           fi
+      # Az appon belüli frissítéshez: az APK a nyilvános kiadás-repóba is felkerül, mellé egy
+      # kis JSON (verzió, versionCode, SHA-256, változások), amit az app induláskor elolvas.
+      # A KIADASOK_TOKEN csak a laskiss-dev/kiadasok repóba tud írni (Contents: Read and write).
+      - name: Kiadás a frissítési tárhelyre
+        if: steps.key.outputs.ok == 'true'
+        env:
+          KIADASOK_TOKEN: ${{ secrets.KIADASOK_TOKEN }}
+        run: |
+          if [ -z "$KIADASOK_TOKEN" ]; then
+            echo "::warning::Hiányzik a KIADASOK_TOKEN a repó Secrets beállításai közül, ezért ez a verzió nem kerül fel a kiadás-repóba, az appon belüli frissítés nem fogja látni."
+            exit 0
+          fi
+          export GH_TOKEN="$KIADASOK_TOKEN"
+          REPO=laskiss-dev/kiadasok
+          NAME=remote-for-adguard-home
+          VER=$(grep -oP "versionName '\K[^']+" app/build.gradle)
+          CODE=$(grep -oP "versionCode \K[0-9]+" app/build.gradle)
+          APK=app/build/outputs/apk/release/Remote-for-AdGuard-Home-$VER.apk
+          TAG="$NAME-v$VER"
+          URL="https://github.com/$REPO/releases/download/$TAG/$(basename "$APK")"
+          JSON="$RUNNER_TEMP/$NAME.json"
+          python3 -I .github/kiadas.py "$APK" hu.laskiss.remoteforadguardhome "$VER" "$CODE" "$URL" \
+            app/src/main/java/hu/laskiss/remoteforadguardhome/InfoActivity.java "$JSON"
+          NOTES=$(python3 -I -c "import json,sys; d=json.load(open(sys.argv[1])); print('\n'.join('- ' + c for c in d['changes']))" "$JSON")
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" --repo "$REPO" --clobber
+          else
+            gh release create "$TAG" "$APK" --repo "$REPO" --title "Remote for AdGuard Home $VER" --notes "$NOTES"
+          fi
+          # A jelzőfájl csak az APK feltöltése után frissül, így az app sosem lát félkész kiadást.
+          SHA=$(gh api "repos/$REPO/contents/$NAME.json" --jq .sha 2>/dev/null || true)
+          ARGS=(-X PUT "repos/$REPO/contents/$NAME.json" -f message="Remote for AdGuard Home $VER" -f content="$(base64 -w0 "$JSON")")
+          if [ -n "$SHA" ]; then ARGS+=(-f sha="$SHA"); fi
+          gh api "${ARGS[@]}" > /dev/null
+          echo "Kiadva: https://github.com/$REPO/releases/tag/$TAG"

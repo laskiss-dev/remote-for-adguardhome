@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 
-/** Alkalmazás beállítások: téma és képernyő ébren tartása. Ezek a telefonon tárolódnak, a szervert nem érintik. */
+/** Alkalmazás beállítások: téma, képernyő ébren tartása és frissítések. Ezek a telefonon tárolódnak, a szervert nem érintik. */
 public class AppSettingsActivity extends BaseActivity {
 
     static final String[] THEMES = {"Rendszer szerint", "Sötét", "Világos"};
@@ -40,5 +40,15 @@ public class AppSettingsActivity extends BaseActivity {
             prefs.edit().putBoolean("keepAwake", on).apply();
             applyKeepAwake();
         });
+
+        LinearLayout upd = section("Frissítések",
+                "Telepített verzió: " + Updater.currentVersionName(this) + ". Az új verziókat a GitHubról "
+                        + "(" + Updater.REPO + ") tölti le; telepítés előtt ellenőrzi, hogy sértetlen és "
+                        + "ugyanazzal a kulccsal van aláírva, mint ez az app.");
+        Switch auto = switchRow(upd, "Frissítések automatikus keresése",
+                "Induláskor, legfeljebb 6 óránként megnézi, van-e új verzió, és ha van, megkérdezi, telepítsd-e.",
+                prefs.getBoolean(Updater.PREF_AUTO, true));
+        auto.setOnCheckedChangeListener((v, on) -> prefs.edit().putBoolean(Updater.PREF_AUTO, on).apply());
+        button(buttonRow(upd), "Frissítés keresése most", 1, v -> Updater.manualCheck(this, prefs));
     }
 }
