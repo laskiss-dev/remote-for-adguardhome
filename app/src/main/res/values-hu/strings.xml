@@ -464,7 +464,7 @@
     <string name="s_updates_are_installed_from_the_app_aga">"A frissítés ismét az appból települ a Telepítés gombbal, böngésző nélkül"</string>
     <string name="s_from_android_12_it_updates_without_a_s">"Android 12-től külön jóváhagyó ablak nélkül frissül, ha a telefon engedi"</string>
     <string name="s_automatic_update_checks_run_at_most_on">"Az automatikus frissítéskeresés naponta legfeljebb egyszer fut (eddig 6 óránként)"</string>
-    <string name="s_update_the_app_no_longer_installs_by_i">"Frissítés: az app már nem telepít magától, így a Google Play Protect nem jelöli kártékonynak"</string>
+    <string name="s_update_the_app_no_longer_installs_by_i">"Frissítés: az app már nem telepít magától frissítést"</string>
     <string name="s_for_a_new_version_the_download_button">"Új verziónál a Letöltés gomb a böngészőben tölti le a fájlt; a telepítéshez koppints a letöltött fájlra"</string>
     <string name="s_new_in_app_update_at_startup_it_checks">"Új: frissítés az appon belül – induláskor megnézi, van-e új verzió, és ha van, megkérdezi, telepítsd-e"</string>
     <string name="s_before_installing_it_checks_that_the_d">"Telepítés előtt ellenőrzi, hogy a letöltött fájl sértetlen és ugyanazzal a kulccsal van aláírva"</string>

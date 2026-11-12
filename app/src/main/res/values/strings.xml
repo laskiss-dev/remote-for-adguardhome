@@ -464,7 +464,7 @@
     <string name="s_updates_are_installed_from_the_app_aga">"Updates are installed from the app again with the Install button, without a browser"</string>
     <string name="s_from_android_12_it_updates_without_a_s">"From Android 12 it updates without a separate confirmation dialog, if the phone allows it"</string>
     <string name="s_automatic_update_checks_run_at_most_on">"Automatic update checks run at most once a day (previously every 6 hours)"</string>
-    <string name="s_update_the_app_no_longer_installs_by_i">"Update: the app no longer installs by itself, so Google Play Protect does not flag it as harmful"</string>
+    <string name="s_update_the_app_no_longer_installs_by_i">"Update: the app no longer installs updates by itself"</string>
     <string name="s_for_a_new_version_the_download_button">"For a new version the Download button downloads the file in the browser; to install, tap the downloaded file"</string>
     <string name="s_new_in_app_update_at_startup_it_checks">"New: in-app update – at startup it checks for a new version and, if there is one, asks whether to install it"</string>
     <string name="s_before_installing_it_checks_that_the_d">"Before installing it checks that the downloaded file is intact and signed with the same key"</string>
