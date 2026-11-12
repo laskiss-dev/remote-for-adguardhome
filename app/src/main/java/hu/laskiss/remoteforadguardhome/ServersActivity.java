@@ -17,7 +17,7 @@ public class ServersActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        setupPage("Szerverek");
+        setupPage(S.s(R.string.s_servers));
         load();
     }
 
@@ -28,15 +28,15 @@ public class ServersActivity extends BaseActivity {
         List<Servers.Server> list = Servers.load(prefs);
         Servers.Server active = Servers.active(prefs);
 
-        TextView intro = text("Koppints egy szerverre, hogy azt kezeld. A jelszavak titkosítva tárolódnak ezen a telefonon, "
-                + "vagy ha nem kéred a mentést, az app indításkor kéri.", 14, MUTED);
+        TextView intro = text(S.s(R.string.s_tap_a_server_to_manage_it_passwords_ar)
+                + S.s(R.string.s_or_if_you_do_not_want_them_saved_the_a), 14, MUTED);
         intro.setPadding(0, dp(8), 0, 0);
         content.addView(intro);
-        button(buttonRow(content), "Szerver hozzáadása", 1, v -> editServer(null));
+        button(buttonRow(content), S.s(R.string.s_add_server), 1, v -> editServer(null));
 
-        LinearLayout sec = section("Felvett szerverek", null);
+        LinearLayout sec = section(S.s(R.string.s_added_servers), null);
         if (list.isEmpty()) {
-            emptyNote(sec, "Még nincs szerver felvéve.");
+            emptyNote(sec, S.s(R.string.s_no_server_added_yet));
             return;
         }
         for (int i = 0; i < list.size(); i++) {
@@ -48,7 +48,7 @@ public class ServersActivity extends BaseActivity {
             r.setMinimumHeight(dp(56));
             r.setClickable(true);
             r.setFocusable(true);
-            r.setContentDescription(s.name + (isActive ? ", aktív" : ""));
+            r.setContentDescription(s.name + (isActive ? S.s(R.string.s_active) : ""));
             r.setOnClickListener(v -> {
                 if (Net.server != null && Net.server.id.equals(s.id) && Net.api != null) {
                     open(DashboardActivity.class, 0);
@@ -74,12 +74,12 @@ public class ServersActivity extends BaseActivity {
             addr.setSingleLine(true);
             addr.setEllipsize(TextUtils.TruncateAt.MIDDLE);
             col.addView(addr);
-            String proto = a == null ? "" : a.https() ? "HTTPS" : "HTTP (titkosítatlan)";
-            String pw = s.user.isEmpty() ? "nincs jelszó" : s.savePass ? "jelszó mentve" : "jelszót indításkor kéri";
+            String proto = a == null ? "" : a.https() ? "HTTPS" : S.s(R.string.s_http_unencrypted);
+            String pw = s.user.isEmpty() ? S.s(R.string.s_no_password) : s.savePass ? S.s(R.string.s_password_saved) : S.s(R.string.s_asks_for_password_at_startup);
             TextView meta = text(proto + " · " + pw, 12, a != null && !a.https() ? BAD_TEXT : MUTED);
             col.addView(meta);
             r.addView(col, weight(1));
-            r.addView(iconButton(R.drawable.ic_more, "Műveletek", v -> rowMenu(v, s)), new LinearLayout.LayoutParams(dp(44), dp(44)));
+            r.addView(iconButton(R.drawable.ic_more, S.s(R.string.s_actions), v -> rowMenu(v, s)), new LinearLayout.LayoutParams(dp(44), dp(44)));
             sec.addView(r, matchWrap());
         }
     }
@@ -97,12 +97,12 @@ public class ServersActivity extends BaseActivity {
 
     private void rowMenu(View anchor, final Servers.Server s) {
         PopupMenu pm = new PopupMenu(this, anchor);
-        pm.getMenu().add(0, 1, 0, "Szerkesztés");
-        pm.getMenu().add(0, 2, 1, "Törlés");
+        pm.getMenu().add(0, 1, 0, S.s(R.string.s_edit));
+        pm.getMenu().add(0, 2, 1, S.s(R.string.s_delete));
         pm.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == 1) editServer(s);
-            else confirm("Szerver törlése", "Törlöd a(z) „" + s.name + "” szervert? A mentett jelszava is törlődik.",
-                    "Törlés", () -> delete(s));
+            else confirm(S.s(R.string.s_delete_server), S.s(R.string.s_delete_the_server) + s.name + S.s(R.string.s_its_saved_password_is_deleted_too),
+                    S.s(R.string.s_delete), () -> delete(s));
             return true;
         });
         pm.show();

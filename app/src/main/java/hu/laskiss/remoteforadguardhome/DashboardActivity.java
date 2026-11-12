@@ -24,7 +24,7 @@ public class DashboardActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        setupPage("Irányítópult");
+        setupPage(S.s(R.string.s_dashboard));
         load();
     }
 
@@ -88,10 +88,10 @@ public class DashboardActivity extends BaseActivity {
         int perRow = landscape ? 4 : 2;
         LinearLayout line = null;
         Object[][] tiles = {
-                {"DNS-lekérdezések", total, -1.0, "dns_queries", C_QUERIES, F_ALL},
-                {"Szűrők által blokkolva", blocked, pct(blocked, total), "blocked_filtering", C_BLOCKED, F_BLOCKED},
-                {"Blokkolt fenyegetések", safe, pct(safe, total), "replaced_safebrowsing", C_SAFE, F_THREATS},
-                {"Szülői felügyelet által blokkolva", parental, pct(parental, total), "replaced_parental", C_PARENTAL, F_PARENTAL},
+                {S.s(R.string.s_dns_queries), total, -1.0, "dns_queries", C_QUERIES, F_ALL},
+                {S.s(R.string.s_blocked_by_filters), blocked, pct(blocked, total), "blocked_filtering", C_BLOCKED, F_BLOCKED},
+                {S.s(R.string.s_blocked_threats), safe, pct(safe, total), "replaced_safebrowsing", C_SAFE, F_THREATS},
+                {S.s(R.string.s_blocked_by_parental_control), parental, pct(parental, total), "replaced_parental", C_PARENTAL, F_PARENTAL},
         };
         for (int i = 0; i < tiles.length; i++) {
             if (i % perRow == 0) {
@@ -113,19 +113,19 @@ public class DashboardActivity extends BaseActivity {
         }
 
         // Általános statisztikák
-        LinearLayout gen = section("Általános statisztikák", null);
-        statRow(gen, "DNS-lekérdezések", fmt(total), C_QUERIES, F_ALL, false);
-        statRow(gen, "Szűrők által blokkolva", fmt(blocked), C_BLOCKED, F_BLOCKED, true);
-        statRow(gen, "Blokkolt fenyegetések", fmt(safe), C_SAFE, F_THREATS, true);
-        statRow(gen, "Szülői felügyelet által blokkolva", fmt(parental), C_PARENTAL, F_PARENTAL, true);
-        statRow(gen, "Biztonságos keresés kényszerítve", fmt(safesearch), C_SAFESEARCH, F_SAFESEARCH, true);
-        statRow(gen, "Átlagos feldolgozási idő", String.format(Locale.US, "%.0f ms", avg), C_AVG, -1, true);
+        LinearLayout gen = section(S.s(R.string.s_general_statistics), null);
+        statRow(gen, S.s(R.string.s_dns_queries), fmt(total), C_QUERIES, F_ALL, false);
+        statRow(gen, S.s(R.string.s_blocked_by_filters), fmt(blocked), C_BLOCKED, F_BLOCKED, true);
+        statRow(gen, S.s(R.string.s_blocked_threats), fmt(safe), C_SAFE, F_THREATS, true);
+        statRow(gen, S.s(R.string.s_blocked_by_parental_control), fmt(parental), C_PARENTAL, F_PARENTAL, true);
+        statRow(gen, S.s(R.string.s_safe_search_enforced), fmt(safesearch), C_SAFESEARCH, F_SAFESEARCH, true);
+        statRow(gen, S.s(R.string.s_average_processing_time), String.format(Locale.US, "%.0f ms", avg), C_AVG, -1, true);
 
-        topList("Legaktívabb kliensek", "Kliens", "Kérések", st.optJSONArray("top_clients"), total, names, false, true);
-        topList("Leglátogatottabb domainek", "Domain", "Kérések", st.optJSONArray("top_queried_domains"), total, null, false, true);
-        topList("Legtöbbet blokkolt domainek", "Domain", "Kérések", st.optJSONArray("top_blocked_domains"), blocked, null, false, true);
-        topList("Top upstream szerverek", "Upstream", "Válaszok", st.optJSONArray("top_upstreams_responses"), total, null, false, false);
-        topList("Átlagos upstream válaszidő", "Upstream", "Válaszidő", st.optJSONArray("top_upstreams_avg_time"), 0, null, true, false);
+        topList(S.s(R.string.s_most_active_clients), S.s(R.string.s_client), S.s(R.string.s_requests), st.optJSONArray("top_clients"), total, names, false, true);
+        topList(S.s(R.string.s_most_visited_domains), "Domain", S.s(R.string.s_requests), st.optJSONArray("top_queried_domains"), total, null, false, true);
+        topList(S.s(R.string.s_most_blocked_domains), "Domain", S.s(R.string.s_requests), st.optJSONArray("top_blocked_domains"), blocked, null, false, true);
+        topList(S.s(R.string.s_top_upstream_servers), "Upstream", S.s(R.string.s_responses), st.optJSONArray("top_upstreams_responses"), total, null, false, false);
+        topList(S.s(R.string.s_average_upstream_response_time), "Upstream", S.s(R.string.s_response_time), st.optJSONArray("top_upstreams_avg_time"), 0, null, true, false);
     }
 
     static final int C_SAFESEARCH = 0xFF8E7CC3, C_AVG = 0xFF9E9E9E;
@@ -181,7 +181,7 @@ public class DashboardActivity extends BaseActivity {
                          HashMap<String, String> names, boolean seconds, boolean clickable) {
         LinearLayout sec = section(title, null);
         if (a == null || a.length() == 0) {
-            emptyNote(sec, "Nincs adat");
+            emptyNote(sec, S.s(R.string.s_no_data));
             return;
         }
         // A jobb szélen helyet hagyunk a görgetősávnak, a fejléc is ehhez igazodik.
@@ -273,10 +273,10 @@ public class DashboardActivity extends BaseActivity {
     static String periodText(long intervalMs, String units) {
         if (intervalMs > 0) {
             long hours = intervalMs / 3_600_000L;
-            if (hours >= 48) return "Az elmúlt " + (hours / 24) + " nap";
-            if (hours > 0) return "Az elmúlt " + hours + " óra";
+            if (hours >= 48) return S.s(R.string.s_last) + (hours / 24) + S.s(R.string.s_days);
+            if (hours > 0) return S.s(R.string.s_last) + hours + S.s(R.string.s_hours);
         }
-        return "days".equals(units) ? "Napi bontás" : "Óránkénti bontás";
+        return "days".equals(units) ? S.s(R.string.s_daily_breakdown) : S.s(R.string.s_hourly_breakdown);
     }
 
     /** IP → név a kliens-beállításokból, hogy a toplistán nevek jelenjenek meg. */

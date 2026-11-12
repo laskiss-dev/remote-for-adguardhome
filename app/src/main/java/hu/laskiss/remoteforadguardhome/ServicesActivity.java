@@ -22,18 +22,22 @@ public class ServicesActivity extends BaseActivity {
     private final HashMap<String, Switch> switches = new HashMap<>();
     private JSONObject current;
 
-    static final String[][] GROUP_NAMES = {
-            {"ai", "Mesterséges intelligencia"}, {"cdn", "CDN"}, {"dating", "Társkeresés"},
-            {"gambling", "Szerencsejáték"}, {"gaming", "Játékok"}, {"hosting", "Tárhely"},
-            {"messenger", "Üzenetküldők"}, {"music", "Zene"}, {"privacy", "Adatvédelem"},
-            {"shopping", "Vásárlás"}, {"social_network", "Közösségi hálók"}, {"software", "Szoftverek"},
-            {"streaming", "Videó és streaming"}, {"vpn", "VPN"},
+    static String[][] GROUP_NAMES() {
+
+        return new String[][]{
+            {"ai", S.s(R.string.s_artificial_intelligence)}, {"cdn", "CDN"}, {"dating", S.s(R.string.s_dating)},
+            {"gambling", S.s(R.string.s_gambling)}, {"gaming", S.s(R.string.s_games)}, {"hosting", S.s(R.string.s_hosting)},
+            {"messenger", S.s(R.string.s_messengers)}, {"music", S.s(R.string.s_music)}, {"privacy", S.s(R.string.s_privacy)},
+            {"shopping", S.s(R.string.s_shopping)}, {"social_network", S.s(R.string.s_social_networks)}, {"software", S.s(R.string.s_software)},
+            {"streaming", S.s(R.string.s_video_and_streaming)}, {"vpn", "VPN"},
     };
+
+    }
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        setupPage("Blokkolt szolgáltatások");
+        setupPage(S.s(R.string.s_blocked_services));
         load();
     }
 
@@ -52,14 +56,14 @@ public class ServicesActivity extends BaseActivity {
         JSONArray ids = cur.optJSONArray("ids");
         if (ids != null) for (int i = 0; i < ids.length(); i++) blocked.add(ids.optString(i, ""));
 
-        TextView intro = text("A bekapcsolt szolgáltatásokat az AdGuard Home minden eszközön blokkolja, "
-                + "kivéve azokat a klienseket, amelyeknek saját beállításuk van. A változás a Mentés után lép életbe.", 14, MUTED);
+        TextView intro = text(S.s(R.string.s_adguard_home_blocks_the_enabled_servic)
+                + S.s(R.string.s_except_for_clients_that_have_their_own), 14, MUTED);
         intro.setPadding(0, dp(8), 0, 0);
         content.addView(intro);
         LinearLayout top = buttonRow(content);
-        button(top, "Mentés", 1, v -> saveAll());
-        button(top, "Mind tiltása", 0, v -> setAll(true));
-        button(top, "Egyik sem", 0, v -> setAll(false));
+        button(top, S.s(R.string.s_save), 1, v -> saveAll());
+        button(top, S.s(R.string.s_block_all), 0, v -> setAll(true));
+        button(top, S.s(R.string.s_none_2), 0, v -> setAll(false));
 
         // Szolgáltatások csoportonként, a webes felület sorrendjében
         LinkedHashMap<String, List<JSONObject>> groups = new LinkedHashMap<>();
@@ -98,7 +102,7 @@ public class ServicesActivity extends BaseActivity {
             }
         }
         LinearLayout bottom = buttonRow(content);
-        button(bottom, "Mentés", 1, v -> saveAll());
+        button(bottom, S.s(R.string.s_save), 1, v -> saveAll());
     }
 
     private void setAll(boolean on) {
@@ -113,12 +117,12 @@ public class ServicesActivity extends BaseActivity {
             JSONObject sched = cur == null ? null : cur.optJSONObject("schedule");
             if (sched != null) body.put("schedule", sched);
             return Net.api.put("blocked_services/update", body);
-        }, "Mentve: " + ids.size() + " szolgáltatás blokkolva");
+        }, S.s(R.string.s_saved) + ids.size() + S.s(R.string.s_services_blocked));
     }
 
     static String groupName(String id) {
-        for (String[] g : GROUP_NAMES) if (g[0].equals(id)) return g[1];
-        if (id.isEmpty()) return "Egyéb";
+        for (String[] g : GROUP_NAMES()) if (g[0].equals(id)) return g[1];
+        if (id.isEmpty()) return S.s(R.string.s_other);
         return Character.toUpperCase(id.charAt(0)) + id.substring(1).replace('_', ' ');
     }
 }

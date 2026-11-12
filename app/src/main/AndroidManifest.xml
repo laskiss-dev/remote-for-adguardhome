@@ -7,6 +7,7 @@
          Ezért a korlátozást az app kódja végzi (Api / Address): HTTP magától csak otthoni
          hálózati címekre megy, nyilvános címre csak a felhasználó kifejezett jóváhagyásával. -->
     <application
+        android:name=".App"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="Remote for AdGuard Home"

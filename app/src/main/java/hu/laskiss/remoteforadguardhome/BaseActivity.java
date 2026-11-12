@@ -163,7 +163,7 @@ public abstract class BaseActivity extends Activity {
         TextView t = text(title, landscape ? 26 : 28, TEXT);
         t.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
         titleRow.addView(t, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        ImageButton refresh = iconButton(R.drawable.ic_refresh, "Frissítés", v -> load());
+        ImageButton refresh = iconButton(R.drawable.ic_refresh, S.s(R.string.s_refresh), v -> load());
         refresh.setBackground(box(0, BLUE_BORDER, 2, 8));
         titleRow.addView(refresh, new LinearLayout.LayoutParams(dp(48), dp(48)));
         body.addView(titleRow, matchWrap());
@@ -183,7 +183,7 @@ public abstract class BaseActivity extends Activity {
         LinearLayout bar = row();
         bar.setPadding(dp(6), 0, dp(16), 0);
         bar.setMinimumHeight(dp(56));
-        bar.addView(iconButton(R.drawable.ic_menu, "Menü", this::showMainMenu), new LinearLayout.LayoutParams(dp(48), dp(48)));
+        bar.addView(iconButton(R.drawable.ic_menu, S.s(R.string.s_menu), this::showMainMenu), new LinearLayout.LayoutParams(dp(48), dp(48)));
         LinearLayout brand = col();
         TextView name = text("Remote for AdGuard Home", 17, TEXT);
         name.setSingleLine(true);
@@ -216,7 +216,7 @@ public abstract class BaseActivity extends Activity {
     protected <T> void task(final Job<T> job, final Done<T> done) {
         if (Net.api == null) {
             // A szerver kiválasztását / jelszókérést az oldal betöltése már feldobta.
-            setPageStatus("Nincs kiválasztott szerver. A ☰ menü Szerverek pontjában adhatsz meg egyet.", true);
+            setPageStatus(S.s(R.string.s_no_server_selected_you_can_add_one_und), true);
             return;
         }
         Net.NET.execute(() -> {
@@ -248,7 +248,7 @@ public abstract class BaseActivity extends Activity {
     }
 
     protected void loading() {
-        setPageStatus("Betöltés…", false);
+        setPageStatus(S.s(R.string.s_loading), false);
     }
 
     protected void loaded() {
@@ -261,25 +261,25 @@ public abstract class BaseActivity extends Activity {
     void showMainMenu(View anchor) {
         PopupMenu pm = new PopupMenu(this, anchor);
         Menu m = pm.getMenu();
-        m.add(0, NAV_DASH, 0, "Irányítópult");
-        SubMenu set = m.addSubMenu(0, 90, 1, "Beállítások");
-        set.add(0, NAV_GENERAL, 0, "Általános beállítások");
-        set.add(0, NAV_DNS, 1, "DNS beállítások");
-        set.add(0, NAV_TLS, 2, "Titkosítási beállítások");
-        set.add(0, NAV_CLIENTS, 3, "Kliens beállítások");
-        set.add(0, NAV_DHCP, 4, "DHCP beállítások");
-        SubMenu fil = m.addSubMenu(0, 91, 2, "Szűrők");
-        fil.add(0, NAV_BLOCKLISTS, 0, "DNS blokkolási listák");
-        fil.add(0, NAV_ALLOWLISTS, 1, "DNS engedélyezési listák");
-        fil.add(0, NAV_REWRITES, 2, "DNS átírások");
-        fil.add(0, NAV_SERVICES, 3, "Blokkolt szolgáltatások");
-        fil.add(0, NAV_RULES, 4, "Egyéni szűrési szabályok");
-        m.add(0, NAV_LOG, 3, "Lekérdezési napló");
-        m.add(0, NAV_GUIDE, 4, "Beállítási útmutató");
+        m.add(0, NAV_DASH, 0, S.s(R.string.s_dashboard));
+        SubMenu set = m.addSubMenu(0, 90, 1, S.s(R.string.s_settings));
+        set.add(0, NAV_GENERAL, 0, S.s(R.string.s_general_settings));
+        set.add(0, NAV_DNS, 1, S.s(R.string.s_dns_settings));
+        set.add(0, NAV_TLS, 2, S.s(R.string.s_encryption_settings));
+        set.add(0, NAV_CLIENTS, 3, S.s(R.string.s_client_settings));
+        set.add(0, NAV_DHCP, 4, S.s(R.string.s_dhcp_settings));
+        SubMenu fil = m.addSubMenu(0, 91, 2, S.s(R.string.s_filters));
+        fil.add(0, NAV_BLOCKLISTS, 0, S.s(R.string.s_dns_blocklists));
+        fil.add(0, NAV_ALLOWLISTS, 1, S.s(R.string.s_dns_allowlists));
+        fil.add(0, NAV_REWRITES, 2, S.s(R.string.s_dns_rewrites));
+        fil.add(0, NAV_SERVICES, 3, S.s(R.string.s_blocked_services));
+        fil.add(0, NAV_RULES, 4, S.s(R.string.s_custom_filtering_rules));
+        m.add(0, NAV_LOG, 3, S.s(R.string.s_query_log));
+        m.add(0, NAV_GUIDE, 4, S.s(R.string.s_setup_guide));
         addMenuItems(m);
-        m.add(1, NAV_SERVER, 20, "Szerverek");
-        m.add(1, NAV_APPSET, 21, "Alkalmazás beállítások");
-        m.add(1, NAV_INFO, 22, "Információ");
+        m.add(1, NAV_SERVER, 20, S.s(R.string.s_servers));
+        m.add(1, NAV_APPSET, 21, S.s(R.string.s_app_settings));
+        m.add(1, NAV_INFO, 22, S.s(R.string.s_information));
         pm.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
             if (id == 90 || id == 91) return false;
@@ -364,7 +364,7 @@ public abstract class BaseActivity extends Activity {
             pill.setText(min > 0 ? "KI · " + min + " p" : "KI");
             pill.setBackground(box(0xFFB0473A, 0, 0, 4));
         }
-        pill.setContentDescription(p == null ? "Védelem állapota" : p ? "Védelem bekapcsolva" : "Védelem kikapcsolva");
+        pill.setContentDescription(p == null ? S.s(R.string.s_protection_status) : p ? S.s(R.string.s_protection_on) : S.s(R.string.s_protection_off));
     }
 
     void protectionDialog() {
@@ -374,26 +374,26 @@ public abstract class BaseActivity extends Activity {
         }
         if (Net.protection != null && !Net.protection) {
             new AlertDialog.Builder(this)
-                    .setTitle("Védelem bekapcsolása")
-                    .setMessage("Bekapcsolod a DNS-védelmet?")
-                    .setPositiveButton("Bekapcsolás", (d, w) -> Net.setProtection(true, 0))
-                    .setNegativeButton("Mégse", null)
+                    .setTitle(S.s(R.string.s_turn_protection_on))
+                    .setMessage(S.s(R.string.s_turn_dns_protection_on))
+                    .setPositiveButton(S.s(R.string.s_turn_on), (d, w) -> Net.setProtection(true, 0))
+                    .setNegativeButton(S.s(R.string.s_cancel), null)
                     .show();
             return;
         }
-        final String[] labels = {"1 percre", "10 percre", "1 órára", "8 órára", "Amíg vissza nem kapcsolom"};
+        final String[] labels = {S.s(R.string.s_for_1_minute), S.s(R.string.s_for_10_minutes), S.s(R.string.s_for_1_hour), S.s(R.string.s_for_8_hours), S.s(R.string.s_until_i_turn_it_back_on)};
         final long[] ms = {60_000L, 600_000L, 3_600_000L, 28_800_000L, 0L};
         new AlertDialog.Builder(this)
-                .setTitle("Védelem kikapcsolása")
+                .setTitle(S.s(R.string.s_turn_protection_off))
                 .setItems(labels, (d, w) -> Net.setProtection(false, ms[w]))
-                .setNegativeButton("Mégse", null)
+                .setNegativeButton(S.s(R.string.s_cancel), null)
                 .show();
     }
 
     protected void showServer() {
         if (serverLabel == null) return;
         Servers.Server sv = Net.server;
-        serverLabel.setText(Net.api == null || sv == null ? "nincs szerver kiválasztva" : sv.label());
+        serverLabel.setText(Net.api == null || sv == null ? S.s(R.string.s_no_server_selected) : sv.label());
     }
 
     /**
@@ -433,16 +433,16 @@ public abstract class BaseActivity extends Activity {
     void askPassword(final Servers.Server s) {
         LinearLayout f = col();
         f.setPadding(dp(22), dp(8), dp(22), 0);
-        TextView who = text(s.label() + (s.user.isEmpty() ? "" : "\nFelhasználó: " + s.user), 14, SUB);
+        TextView who = text(s.label() + (s.user.isEmpty() ? "" : S.s(R.string.s_user) + s.user), 14, SUB);
         f.addView(who);
-        final EditText pass = field(f, "Jelszó", "", "",
+        final EditText pass = field(f, S.s(R.string.s_password), "", "",
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        final Switch save = switchRow(f, "Jelszó mentése", "Titkosítva tárolja ezen a telefonon.", s.savePass);
+        final Switch save = switchRow(f, S.s(R.string.s_save_password), S.s(R.string.s_stored_encrypted_on_this_phone), s.savePass);
         final AlertDialog d = new AlertDialog.Builder(this)
-                .setTitle("Jelszó szükséges")
+                .setTitle(S.s(R.string.s_password_required))
                 .setView(f)
-                .setPositiveButton("Belépés", null)
-                .setNegativeButton("Szerverek", (x, w) -> { if (!(this instanceof ServersActivity)) open(ServersActivity.class, 0); })
+                .setPositiveButton(S.s(R.string.s_sign_in), null)
+                .setNegativeButton(S.s(R.string.s_servers), (x, w) -> { if (!(this instanceof ServersActivity)) open(ServersActivity.class, 0); })
                 .create();
         d.setOnShowListener(x -> d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             List<Servers.Server> list = Servers.load(prefs);
@@ -467,32 +467,32 @@ public abstract class BaseActivity extends Activity {
         final Address cur = isNew ? null : orig.address();
         LinearLayout f = col();
         f.setPadding(dp(22), dp(8), dp(22), dp(8));
-        final EditText name = field(f, "Név", "pl. Otthon", isNew ? "" : orig.name, InputType.TYPE_CLASS_TEXT);
-        final EditText url = field(f, "Cím", "pl. 192.168.1.10:3000", cur == null ? (isNew ? "" : orig.url) : cur.display(),
+        final EditText name = field(f, S.s(R.string.s_name), S.s(R.string.s_e_g_home), isNew ? "" : orig.name, InputType.TYPE_CLASS_TEXT);
+        final EditText url = field(f, S.s(R.string.s_address), "pl. 192.168.1.10:3000", cur == null ? (isNew ? "" : orig.url) : cur.display(),
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-        final Choice proto = new Choice(f, "Kapcsolat", new String[]{"HTTPS (titkosított, ajánlott)", "HTTP (titkosítatlan)"},
+        final Choice proto = new Choice(f, S.s(R.string.s_connection), new String[]{S.s(R.string.s_https_encrypted_recommended), S.s(R.string.s_http_unencrypted)},
                 cur == null || cur.https() ? 0 : 1);
-        final EditText user = field(f, "Felhasználónév", "", isNew ? "" : orig.user,
+        final EditText user = field(f, S.s(R.string.s_username), "", isNew ? "" : orig.user,
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         final boolean hadSaved = !isNew && orig.savePass && !orig.encPass.isEmpty();
-        final EditText pass = field(f, "Jelszó", hadSaved ? "(mentve – üresen változatlan marad)" : "", "",
+        final EditText pass = field(f, S.s(R.string.s_password), hadSaved ? S.s(R.string.s_saved_leave_empty_to_keep) : "", "",
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        final Switch save = switchRow(f, "Jelszó mentése",
-                "Titkosítva tárolja ezen a telefonon. Kikapcsolva az app minden indításkor kéri.",
+        final Switch save = switchRow(f, S.s(R.string.s_save_password),
+                S.s(R.string.s_stored_encrypted_on_this_phone_when_of),
                 isNew || orig.savePass);
-        TextView note = text("A cím ugyanaz, amin a böngészőben a webes felületet megnyitod. "
-                + "HTTP-n a jelszó titkosítatlanul megy át; ezt az app csak otthoni címekre (pl. 192.168.x.x) "
-                + "engedi magától.", 12, MUTED);
+        TextView note = text(S.s(R.string.s_the_address_is_the_same_one_you_use_to)
+                + S.s(R.string.s_over_http_the_password_is_sent_unencry)
+                + S.s(R.string.s_on_its_own), 12, MUTED);
         note.setPadding(0, dp(10), 0, 0);
         f.addView(note);
         ScrollView sv = new ScrollView(this);
         sv.addView(f);
         final AlertDialog d = new AlertDialog.Builder(this)
-                .setTitle(isNew ? "Új szerver" : "Szerver szerkesztése")
+                .setTitle(isNew ? S.s(R.string.s_new_server) : S.s(R.string.s_edit_server))
                 .setView(sv)
-                .setPositiveButton("Mentés", null)
-                .setNeutralButton("Kapcsolat tesztelése", null)
-                .setNegativeButton("Mégse", null)
+                .setPositiveButton(S.s(R.string.s_save), null)
+                .setNeutralButton(S.s(R.string.s_test_connection), null)
+                .setNegativeButton(S.s(R.string.s_cancel), null)
                 .create();
         final boolean[] publicHttpOk = {!isNew && orig.allowPublicHttp};
         d.setOnShowListener(x -> {
@@ -532,13 +532,13 @@ public abstract class BaseActivity extends Activity {
                         if (old != null) pw = old;
                     }
                     final Api test = new Api(a, user.getText().toString().trim(), pw, publicHttpOk[0]);
-                    Toast.makeText(this, "Kapcsolódás…", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, S.s(R.string.s_connecting), Toast.LENGTH_SHORT).show();
                     Net.NET.execute(() -> {
                         String res;
                         boolean ok;
                         try {
                             JSONObject st = test.getJson("status");
-                            res = "Sikeres kapcsolat.\nAdGuard Home " + st.optString("version", "?");
+                            res = S.s(R.string.s_connection_successful_adguard_home) + st.optString("version", "?");
                             ok = true;
                         } catch (Exception e) {
                             res = Net.msg(e);
@@ -549,9 +549,9 @@ public abstract class BaseActivity extends Activity {
                         Net.MAIN.post(() -> {
                             if (isDestroyed()) return;
                             new AlertDialog.Builder(this)
-                                    .setTitle(good ? "Kapcsolat rendben" : "Nem sikerült kapcsolódni")
+                                    .setTitle(good ? S.s(R.string.s_connection_ok) : S.s(R.string.s_could_not_connect))
                                     .setMessage(r)
-                                    .setPositiveButton("Rendben", null)
+                                    .setPositiveButton(S.s(R.string.s_ok), null)
                                     .show();
                         });
                     });
@@ -583,15 +583,15 @@ public abstract class BaseActivity extends Activity {
             return;
         }
         new AlertDialog.Builder(this)
-                .setTitle("Titkosítatlan kapcsolat")
-                .setMessage("A " + a.display() + " nem otthoni hálózati cím. HTTP-n a felhasználónév és a jelszó "
-                        + "titkosítatlanul menne át az interneten, amit bárki láthat, aki a forgalmat figyeli.\n\n"
-                        + "Ajánlott helyette HTTPS-t használni. Biztosan HTTP-vel akarsz kapcsolódni?")
-                .setPositiveButton("Igen, HTTP-vel", (x, w) -> {
+                .setTitle(S.s(R.string.s_unencrypted_connection))
+                .setMessage("A " + a.display() + S.s(R.string.s_is_not_a_home_network_address_over_htt)
+                        + S.s(R.string.s_would_travel_unencrypted_over_the_inte)
+                        + S.s(R.string.s_using_https_instead_is_recommended_are))
+                .setPositiveButton(S.s(R.string.s_yes_use_http), (x, w) -> {
                     ok[0] = true;
                     then.run();
                 })
-                .setNegativeButton("Mégse", null)
+                .setNegativeButton(S.s(R.string.s_cancel), null)
                 .show();
     }
 
@@ -761,7 +761,7 @@ public abstract class BaseActivity extends Activity {
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton(yes, (d, w) -> r.run())
-                .setNegativeButton("Mégse", null)
+                .setNegativeButton(S.s(R.string.s_cancel), null)
                 .show();
     }
 

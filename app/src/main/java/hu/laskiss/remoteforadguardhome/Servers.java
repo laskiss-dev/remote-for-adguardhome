@@ -159,7 +159,7 @@ final class Servers {
         String url = p.getString("url", "");
         if (url.isEmpty() || p.getString("servers", null) != null) return;
         Server s = new Server();
-        s.name = "Otthon";
+        s.name = S.s(R.string.s_home);
         try {
             Address a = Address.parse(url, "http");
             s.url = a.base();

@@ -15,13 +15,15 @@ final class Entry {
     static final int PROCESSED = 0, BLOCKED = 1, ALLOWED = 2, REWRITTEN = 3;
 
     private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy. MM. dd.");
+    private static DateTimeFormatter DATE() {
+        return DateTimeFormatter.ofPattern(S.s(R.string.s_date_fmt));
+    }
 
     String key = "";
     String time = "", date = "";
     String domain = "", shown = "", type = "", proto = "";
     String client = "", clientName = "";
-    String reason = "", status = "Feldolgozva", elapsed = "", upstream = "";
+    String reason = "", status = S.s(R.string.s_processed), elapsed = "", upstream = "";
     String service = "", ruleText = "", answer = "";
     int filterId = -1;
     int kind = PROCESSED;
@@ -33,7 +35,7 @@ final class Entry {
         try {
             ZonedDateTime z = OffsetDateTime.parse(raw).atZoneSameInstant(ZoneId.systemDefault());
             e.time = TIME.format(z);
-            e.date = DATE.format(z);
+            e.date = DATE().format(z);
         } catch (Exception ex) {
             e.time = raw;
         }
@@ -86,25 +88,25 @@ final class Entry {
 
         switch (e.reason) {
             case "FilteredBlackList":
-                e.kind = BLOCKED; e.status = "Blokkolva"; break;
+                e.kind = BLOCKED; e.status = S.s(R.string.s_blocked); break;
             case "FilteredSafeBrowsing":
-                e.kind = BLOCKED; e.status = "Blokkolt fenyegetés"; break;
+                e.kind = BLOCKED; e.status = S.s(R.string.s_blocked_threat); break;
             case "FilteredParental":
-                e.kind = BLOCKED; e.status = "Szülői felügyelet által blokkolva"; break;
+                e.kind = BLOCKED; e.status = S.s(R.string.s_blocked_by_parental_control); break;
             case "FilteredBlockedService":
-                e.kind = BLOCKED; e.status = "Blokkolt szolgáltatás"; break;
+                e.kind = BLOCKED; e.status = S.s(R.string.s_blocked_service); break;
             case "FilteredInvalid":
-                e.kind = BLOCKED; e.status = "Érvénytelen kérés"; break;
+                e.kind = BLOCKED; e.status = S.s(R.string.s_invalid_request); break;
             case "NotFilteredWhiteList":
-                e.kind = ALLOWED; e.status = "Engedve"; break;
+                e.kind = ALLOWED; e.status = S.s(R.string.s_allowed); break;
             case "Rewrite":
             case "RewriteEtcHosts":
             case "RewriteRule":
-                e.kind = REWRITTEN; e.status = "Átírt"; break;
+                e.kind = REWRITTEN; e.status = S.s(R.string.s_rewritten); break;
             case "FilteredSafeSearch":
-                e.kind = REWRITTEN; e.status = "Biztonságos keresés"; break;
+                e.kind = REWRITTEN; e.status = S.s(R.string.s_safe_search_2); break;
             default:
-                e.kind = PROCESSED; e.status = "Feldolgozva";
+                e.kind = PROCESSED; e.status = S.s(R.string.s_processed);
         }
 
         e.key = raw + "|" + e.domain + "|" + e.type + "|" + e.client;
@@ -117,7 +119,7 @@ final class Entry {
             case "dot": return "DNS-over-TLS";
             case "doq": return "DNS-over-QUIC";
             case "dnscrypt": return "DNSCrypt";
-            default: return "Egyszerű DNS";
+            default: return S.s(R.string.s_plain_dns);
         }
     }
 

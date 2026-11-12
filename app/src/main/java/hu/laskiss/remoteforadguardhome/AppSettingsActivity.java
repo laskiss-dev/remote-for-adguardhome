@@ -7,12 +7,16 @@ import android.widget.Switch;
 /** Alkalmazás beállítások: téma, képernyő ébren tartása és frissítések. Ezek a telefonon tárolódnak, a szervert nem érintik. */
 public class AppSettingsActivity extends BaseActivity {
 
-    static final String[] THEMES = {"Rendszer szerint", "Sötét", "Világos"};
+    static String[] THEMES() {
+
+        return new String[]{S.s(R.string.s_follow_system), S.s(R.string.s_dark), S.s(R.string.s_light)};
+
+    }
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        setupPage("Alkalmazás beállítások");
+        setupPage(S.s(R.string.s_app_settings));
         load();
     }
 
@@ -21,8 +25,8 @@ public class AppSettingsActivity extends BaseActivity {
         content.removeAllViews();
         setPageStatus("", false);
 
-        LinearLayout look = section("Megjelenés", null);
-        final Choice theme = new Choice(look, "Téma", THEMES, prefs.getInt("theme", 1));
+        LinearLayout look = section(S.s(R.string.s_appearance), null);
+        final Choice theme = new Choice(look, S.s(R.string.s_theme), THEMES(), prefs.getInt("theme", 1));
         theme.onChange = () -> {
             prefs.edit().putInt("theme", theme.sel).apply();
             if (wantsLight(this, prefs) != light) {
@@ -31,10 +35,10 @@ public class AppSettingsActivity extends BaseActivity {
             }
         };
 
-        LinearLayout scr = section("Képernyő", null);
-        Switch awake = switchRow(scr, "Képernyő ébren tartása",
-                "Amíg az app előtérben van, a telefon nem sötétíti el és nem zárja le a képernyőt. "
-                        + "Ha kilépsz az appból, a telefon a szokásos módon működik.",
+        LinearLayout scr = section(S.s(R.string.s_screen), null);
+        Switch awake = switchRow(scr, S.s(R.string.s_keep_screen_on),
+                S.s(R.string.s_while_the_app_is_in_the_foreground_the)
+                        + S.s(R.string.s_when_you_leave_the_app_the_phone_works),
                 prefs.getBoolean("keepAwake", false));
         awake.setOnCheckedChangeListener((v, on) -> {
             prefs.edit().putBoolean("keepAwake", on).apply();
@@ -46,7 +50,7 @@ public class AppSettingsActivity extends BaseActivity {
             ver = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (Exception ignored) {
         }
-        section("Névjegy", "Telepített verzió: " + ver + ". Az app nem tölt le és nem telepít "
-                + "frissítést; az új verziót a Google Play-ről vagy a GitHub kiadások oldaláról kapod.");
+        section(S.s(R.string.s_about), S.s(R.string.s_installed_version) + ver + S.s(R.string.s_the_app_does_not_download_or_install)
+                + S.s(R.string.s_updates_you_get_new_versions_from_goog));
     }
 }

@@ -11,91 +11,97 @@ import org.json.JSONObject;
 public class InfoActivity extends BaseActivity {
 
     /** Változásnapló, a legújabb elöl: verzió, dátum, változások. */
-    static final String[][] CHANGES = {
-            {"2.4.3", "2026. 11. 06.",
-                    "A frissítés ismét az appból települ a Telepítés gombbal, böngésző nélkül",
-                    "Android 12-től külön jóváhagyó ablak nélkül frissül, ha a telefon engedi"},
-            {"2.4.2", "2026. 11. 06.",
-                    "Az automatikus frissítéskeresés naponta legfeljebb egyszer fut (eddig 6 óránként)"},
-            {"2.4.1", "2026. 11. 06.",
-                    "Frissítés: az app már nem telepít magától, így a Google Play Protect nem jelöli kártékonynak",
-                    "Új verziónál a Letöltés gomb a böngészőben tölti le a fájlt; a telepítéshez koppints a letöltött fájlra"},
-            {"2.4", "2026. 11. 06.",
-                    "Új: frissítés az appon belül – induláskor megnézi, van-e új verzió, és ha van, megkérdezi, telepítsd-e",
-                    "Telepítés előtt ellenőrzi, hogy a letöltött fájl sértetlen és ugyanazzal a kulccsal van aláírva",
-                    "Alkalmazás beállítások → Frissítések: automatikus keresés ki/be, Frissítés keresése most"},
-            {"2.3", "2026. 11. 03.",
-                    "A menü felépítése most teljesen megegyezik az AdGuard Home webes felületével",
-                    "Új: Beállítások → Titkosítási beállítások (HTTPS, DNS-over-HTTPS/TLS/QUIC, tanúsítvány és privát kulcs, ellenőrzéssel)",
-                    "Új: Beállítási útmutató a szerver DNS-címeivel és eszközönkénti lépésekkel (Router, Windows, macOS, Android, iOS, DNS adatvédelem)"},
-            {"2.2", "2026. 11. 01.",
-                    "Lekérdezési napló: a sor hosszú nyomására megjelenő menüben új pont: Megnyitás külső böngészőben",
-                    "A domaint https:// címként a telefon alapértelmezett böngészője nyitja meg"},
-            {"2.1", "2026. 11. 01.",
-                    "Lekérdezési napló: rövid hangjelzés, amikor új zöld (kiemelt) sorok jelennek meg",
-                    "A ☰ menüben kikapcsolható; ha az új sorok kiemelése ki van kapcsolva, a hangjelzés sem szól"},
-            {"2.0", "2026. 10. 31.",
-                    "Több szerver: a ☰ menü Szerverek pontjában felvehetsz, szerkeszthetsz, törölhetsz és válthatsz",
-                    "Kapcsolat tesztelése a szerver beállításánál",
-                    "A jelszavak titkosítva tárolódnak (Android Keystore); a mentés szerverenként kikapcsolható",
-                    "HTTPS az alapértelmezett; titkosítatlan HTTP-t az app otthoni címekre enged, nyilvánosra csak megerősítés után",
-                    "A szervercím ellenőrzése, rövidebb és érthetőbb hibaüzenetek",
-                    "A fejlécben a szerver neve is látszik"},
-            {"1.9.3", "2026. 10. 31.",
-                    "Új név: Remote for AdGuard Home (korábban AdguardHome-remote)",
-                    "Új alkalmazásazonosító és új aláírókulcs; a korábbi változat mellé külön appként települ"},
-            {"1.9.2", "2026. 10. 31.",
-                    "Licenc: GNU GPL 3. verzió, a teljes szöveg az Információ oldalon olvasható",
-                    "Az Információ oldalon jelölve, hogy ez független, nem hivatalos alkalmazás"},
-            {"1.9.1", "2026. 10. 31.",
-                    "Irányítópult: kisebb számok az Általános statisztikákban",
-                    "A toplisták szövege nem lóg bele a görgetősávba"},
-            {"1.9", "2026. 10. 31.",
-                    "Új, lapos, vektoros alkalmazásikon: ház (otthoni hálózat), szerver és védőpajzs",
-                    "Kisebb APK, az ikon minden méretben éles"},
-            {"1.8", "2026. 10. 31.",
-                    "Irányítópult a webes felület szerint: grafikonok, Általános statisztikák, majd a toplisták",
-                    "A toplisták fix magasságú, görgethető dobozokban, így az oldal rövidebb",
-                    "A grafikonokra és a statisztikákra koppintva a napló az adott szűrővel nyílik"},
-            {"1.7", "2026. 10. 31.",
-                    "Lekérdezési napló: görgetéskor a cím, a kereső és a szűrő felcsúszik, mint a webes felületen",
-                    "Lejjebb görgetve a jobb alsó sarokban megjelenik egy gomb, amivel egyből a lista tetejére ugorhatsz"},
-            {"1.6", "2026. 10. 29.",
-                    "Új alkalmazásikon",
-                    "Az APK fájl neve: AdguardHome-remote"},
-            {"1.5", "2026. 10. 29.",
-                    "Új Alkalmazás beállítások oldal: sötét, világos vagy a rendszer szerinti téma",
-                    "Képernyő ébren tartása, amíg az app előtérben van",
-                    "Javítva: a menüből megnyitott lekérdezési napló nem tartja meg az Irányítópultról indított keresést"},
-            {"1.4", "2026. 10. 29.",
-                    "A lekérdezési naplóban a második sorral együtt a dátum is megjelenik az idő alatt",
-                    "Blokkolási lista hozzáadása a webes felülethez hasonlóan: választás a listából vagy egyedi lista",
-                    "A Szűrők és a Beállítások menüpontjai a webes felület elnevezéseivel és sorrendjében"},
-            {"1.3", "2026. 10. 29.",
-                    "Új név: AdguardHome-remote",
-                    "Az Irányítópult lett a kezdőképernyő",
-                    "A lekérdezési napló szűrője új sorrendben és új elnevezésekkel",
-                    "Új Információ oldal változásnaplóval"},
-            {"1.2", "2026. 10. 29.",
-                    "A lekérdezési naplóban a legutóbbi frissítéssel érkezett sorok zölddel látszanak",
-                    "A kiemelés a menüből kikapcsolható"},
-            {"1.1", "2026. 10. 28.",
-                    "Irányítópult statisztikákkal és toplistákkal",
-                    "Szűrők: blokkolási és engedélyezési listák, egyéni szabályok, DNS átírások, blokkolt szolgáltatások",
-                    "Kliens beállítások és hozzáférési listák",
-                    "Általános, DNS és DHCP beállítások",
-                    "Közös menü a webes felület oldalsávja szerint"},
-            {"1.0", "2026. 10. 28.",
-                    "Lekérdezési napló álló és fekvő nézettel",
-                    "Automatikus frissítés, amely csak az új sorokat tölti le",
-                    "Keresés és szűrés a szerveren, blokkolás és feloldás egy koppintással",
-                    "Védelem be- és kikapcsolása, szüneteltetése"},
+    static String[][] CHANGES() {
+        return new String[][]{
+            {"2.5.0", "2026-11-12",
+                    S.s(R.string.s_new_english_language_the_app_follows_th),
+                    S.s(R.string.s_the_in_app_updater_and_the_install_perm),
+                    S.s(R.string.s_a_privacy_policy_was_added_to_the_repos)},
+            {"2.4.3", "2026-11-06",
+                    S.s(R.string.s_updates_are_installed_from_the_app_aga),
+                    S.s(R.string.s_from_android_12_it_updates_without_a_s)},
+            {"2.4.2", "2026-11-06",
+                    S.s(R.string.s_automatic_update_checks_run_at_most_on)},
+            {"2.4.1", "2026-11-06",
+                    S.s(R.string.s_update_the_app_no_longer_installs_by_i),
+                    S.s(R.string.s_for_a_new_version_the_download_button)},
+            {"2.4", "2026-11-06",
+                    S.s(R.string.s_new_in_app_update_at_startup_it_checks),
+                    S.s(R.string.s_before_installing_it_checks_that_the_d),
+                    S.s(R.string.s_app_settings_updates_automatic_checkin)},
+            {"2.3", "2026-11-03",
+                    S.s(R.string.s_the_menu_structure_now_matches_the_adg),
+                    S.s(R.string.s_new_settings_encryption_settings_https),
+                    S.s(R.string.s_new_setup_guide_with_the_server_s_dns)},
+            {"2.2", "2026-11-01",
+                    S.s(R.string.s_query_log_new_item_in_the_menu_shown_o),
+                    S.s(R.string.s_the_domain_is_opened_as_an_https_addre)},
+            {"2.1", "2026-11-01",
+                    S.s(R.string.s_query_log_short_sound_when_new_green_h),
+                    S.s(R.string.s_can_be_turned_off_in_the_menu_if_highl)},
+            {"2.0", "2026-10-31",
+                    S.s(R.string.s_multiple_servers_in_the_servers_item_o),
+                    S.s(R.string.s_connection_test_in_the_server_settings),
+                    S.s(R.string.s_passwords_are_stored_encrypted_android),
+                    S.s(R.string.s_https_is_the_default_the_app_allows_un),
+                    S.s(R.string.s_server_address_validation_shorter_and),
+                    S.s(R.string.s_the_server_name_is_also_shown_in_the_h)},
+            {"1.9.3", "2026-10-31",
+                    S.s(R.string.s_new_name_remote_for_adguard_home_forme),
+                    S.s(R.string.s_new_application_id_and_new_signing_key)},
+            {"1.9.2", "2026-10-31",
+                    S.s(R.string.s_license_gnu_gpl_version_3_the_full_tex),
+                    S.s(R.string.s_the_information_page_states_that_this)},
+            {"1.9.1", "2026-10-31",
+                    S.s(R.string.s_dashboard_smaller_numbers_in_general_s),
+                    S.s(R.string.s_the_text_of_the_top_lists_no_longer_ru)},
+            {"1.9", "2026-10-31",
+                    S.s(R.string.s_new_flat_vector_app_icon_a_house_home),
+                    S.s(R.string.s_smaller_apk_the_icon_is_sharp_at_every)},
+            {"1.8", "2026-10-31",
+                    S.s(R.string.s_dashboard_following_the_web_interface),
+                    S.s(R.string.s_the_top_lists_are_in_fixed_height_scro),
+                    S.s(R.string.s_tapping_the_charts_and_statistics_open)},
+            {"1.7", "2026-10-31",
+                    S.s(R.string.s_query_log_when_scrolling_the_title_the),
+                    S.s(R.string.s_when_scrolled_down_a_button_appears_in)},
+            {"1.6", "2026-10-29",
+                    S.s(R.string.s_new_app_icon),
+                    S.s(R.string.s_the_apk_file_name_adguardhome_remote)},
+            {"1.5", "2026-10-29",
+                    S.s(R.string.s_new_app_settings_page_dark_light_or_fo),
+                    S.s(R.string.s_keep_the_screen_on_while_the_app_is_in),
+                    S.s(R.string.s_fixed_the_query_log_opened_from_the_me)},
+            {"1.4", "2026-10-29",
+                    S.s(R.string.s_in_the_query_log_the_date_is_also_show),
+                    S.s(R.string.s_adding_a_blocklist_like_in_the_web_int),
+                    S.s(R.string.s_the_items_of_filters_and_settings_use)},
+            {"1.3", "2026-10-29",
+                    S.s(R.string.s_new_name_adguardhome_remote),
+                    S.s(R.string.s_the_dashboard_became_the_start_screen),
+                    S.s(R.string.s_the_query_log_filter_has_a_new_order_a),
+                    S.s(R.string.s_new_information_page_with_a_changelog)},
+            {"1.2", "2026-10-29",
+                    S.s(R.string.s_in_the_query_log_rows_that_arrived_wit),
+                    S.s(R.string.s_the_highlighting_can_be_turned_off_in)},
+            {"1.1", "2026-10-28",
+                    S.s(R.string.s_dashboard_with_statistics_and_top_list),
+                    S.s(R.string.s_filters_blocklists_and_allowlists_cust),
+                    S.s(R.string.s_client_settings_and_access_lists),
+                    S.s(R.string.s_general_dns_and_dhcp_settings),
+                    S.s(R.string.s_shared_menu_following_the_web_interfac)},
+            {"1.0", "2026-10-28",
+                    S.s(R.string.s_query_log_with_portrait_and_landscape),
+                    S.s(R.string.s_automatic_refresh_that_downloads_only),
+                    S.s(R.string.s_search_and_filtering_on_the_server_blo),
+                    S.s(R.string.s_turn_protection_on_and_off_pause_it)},
     };
+    }
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        setupPage("Információ");
+        setupPage(S.s(R.string.s_information));
         load();
     }
 
@@ -105,21 +111,21 @@ public class InfoActivity extends BaseActivity {
         setPageStatus("", false);
 
         LinearLayout app = section("Remote for AdGuard Home", null);
-        kv(app, "Verzió", versionName());
-        kv(app, "Készítette", "Kiss László");
-        TextView about = text("A saját AdGuard Home szervered kezelése telefonról: lekérdezési napló, statisztika, "
-                + "szűrők, kliensek és beállítások.", 13, MUTED);
+        kv(app, S.s(R.string.s_version), versionName());
+        kv(app, S.s(R.string.s_developed_by), S.s(R.string.s_laszlo_kiss));
+        TextView about = text(S.s(R.string.s_manage_your_own_adguard_home_server_fr)
+                + S.s(R.string.s_filters_clients_and_settings), 13, MUTED);
         about.setPadding(0, dp(8), 0, 0);
         app.addView(about);
-        TextView indep = text("Nem hivatalos alkalmazás. Független fejlesztés: nem áll kapcsolatban az AdGuard Home "
-                + "fejlesztőivel, az AdGuard csapatával, és nem ők készítették vagy támogatják. "
-                + "Az „AdGuard” név az AdGuard védjegye, itt csak annak jelzésére szerepel, hogy az app mihez készült.", 13, MUTED);
+        TextView indep = text(S.s(R.string.s_unofficial_app_an_independent_project)
+                + S.s(R.string.s_developers_or_the_adguard_team_and_was)
+                + S.s(R.string.s_adguard_is_a_trademark_of_adguard_and), 13, MUTED);
         indep.setPadding(0, dp(8), 0, 0);
         app.addView(indep);
 
-        final LinearLayout srv = section("Szerver", null);
-        kv(srv, "Név", Net.server == null ? "nincs kiválasztva" : Net.server.name);
-        kv(srv, "Cím", Net.api == null ? "–" : (Net.api.address.https() ? "https://" : "http://") + Net.api.host);
+        final LinearLayout srv = section(S.s(R.string.s_server), null);
+        kv(srv, S.s(R.string.s_name), Net.server == null ? S.s(R.string.s_not_selected) : Net.server.name);
+        kv(srv, S.s(R.string.s_address), Net.api == null ? "–" : (Net.api.address.https() ? "https://" : "http://") + Net.api.host);
         final TextView ver = text("…", 14, TEXT);
         LinearLayout line = row();
         line.setPadding(0, dp(4), 0, dp(4));
@@ -127,29 +133,31 @@ public class InfoActivity extends BaseActivity {
         line.addView(ver, weight(1));
         srv.addView(line, matchWrap());
         if (Net.api != null) {
-            task(() -> Net.api.getJson("status"), (JSONObject r) -> ver.setText(r.optString("version", "ismeretlen")));
+            task(() -> Net.api.getJson("status"), (JSONObject r) -> ver.setText(r.optString("version", S.s(R.string.s_unknown))));
         } else {
             ver.setText("–");
         }
 
-        LinearLayout lic = section("Licenc", null);
-        kv(lic, "Licenc", "GNU GPL 3. verzió (GPLv3)");
-        kv(lic, "Szerzői jog", "© 2026 Kiss László");
-        TextView notice = text("Ez a program szabad szoftver: a Free Software Foundation által kiadott GNU General Public "
-                + "License 3. verziója szerint terjesztheted és módosíthatod. A programot abban a reményben adom közre, "
-                + "hogy hasznos lesz, de minden garancia nélkül, beleértve az eladhatóságra vagy egy adott célra való "
-                + "alkalmasságra vonatkozó hallgatólagos garanciát is. A részleteket a licenc teljes szövege tartalmazza.", 13, MUTED);
+        LinearLayout lic = section(S.s(R.string.s_license), null);
+        kv(lic, S.s(R.string.s_license), S.s(R.string.s_gnu_gpl_version_3_gplv3));
+        kv(lic, S.s(R.string.s_copyright), S.s(R.string.s_2026_laszlo_kiss));
+        TextView notice = text(S.s(R.string.s_this_program_is_free_software_you_can)
+                + S.s(R.string.s_license_version_3_as_published_by_the)
+                + S.s(R.string.s_that_it_will_be_useful_but_without_any)
+                + S.s(R.string.s_for_a_particular_purpose_see_the_full), 13, MUTED);
         notice.setPadding(0, dp(8), 0, 0);
         lic.addView(notice);
-        button(buttonRow(lic), "Teljes licencszöveg (angol)", 0, v -> showLicense());
+        button(buttonRow(lic), S.s(R.string.s_full_license_text_english), 0, v -> showLicense());
 
-        LinearLayout log = section("Változásnapló", null);
-        for (int i = 0; i < CHANGES.length; i++) {
-            String[] v = CHANGES[i];
+        LinearLayout log = section(S.s(R.string.s_changelog), null);
+        final String[][] changes = CHANGES();
+        for (int i = 0; i < changes.length; i++) {
+            String[] v = changes[i];
             if (i > 0) divider(log);
             LinearLayout c = col();
             c.setPadding(0, dp(10), 0, dp(8));
-            TextView h = text(v[0] + "  ·  " + v[1], 15, TEXT);
+            TextView h = text(v[0] + "  ·  " + java.time.LocalDate.parse(v[1])
+                    .format(java.time.format.DateTimeFormatter.ofPattern(S.s(R.string.s_date_fmt))), 15, TEXT);
             h.setTypeface(Typeface.DEFAULT_BOLD);
             c.addView(h);
             for (int j = 2; j < v.length; j++) {
@@ -173,7 +181,7 @@ public class InfoActivity extends BaseActivity {
             in.close();
             text = bo.toString("UTF-8");
         } catch (Exception e) {
-            text = "A licenc szövege nem olvasható. Elérhető itt: https://www.gnu.org/licenses/gpl-3.0.html";
+            text = S.s(R.string.s_the_license_text_cannot_be_read_it_is);
         }
         TextView t = text(text, 11, TEXT);
         t.setTypeface(Typeface.MONOSPACE);
@@ -184,7 +192,7 @@ public class InfoActivity extends BaseActivity {
         new android.app.AlertDialog.Builder(this)
                 .setTitle("GNU General Public License v3")
                 .setView(sv)
-                .setPositiveButton("Bezárás", null)
+                .setPositiveButton(S.s(R.string.s_close), null)
                 .show();
     }
 
@@ -192,7 +200,7 @@ public class InfoActivity extends BaseActivity {
         try {
             return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (Exception e) {
-            return CHANGES[0][0];
+            return CHANGES()[0][0];
         }
     }
 }

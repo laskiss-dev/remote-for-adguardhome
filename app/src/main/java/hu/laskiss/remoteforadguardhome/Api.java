@@ -82,8 +82,8 @@ final class Api {
     String request(String method, String path, String body, int readTimeout) throws IOException {
         if (!address.https() && !address.isLocal() && !allowPublicHttp) {
             // Védőháló: nyilvános címre jóváhagyás nélkül nem küldünk jelszót titkosítatlanul.
-            throw new IOException("Titkosítatlan (HTTP) kapcsolat nyilvános címre nincs engedélyezve. "
-                    + "Használj HTTPS-t, vagy engedélyezd a szerver beállításánál.");
+            throw new IOException(S.s(R.string.s_unencrypted_http_connections_to_public)
+                    + S.s(R.string.s_use_https_or_allow_it_in_the_server_se));
         }
         HttpURLConnection c = (HttpURLConnection) new URL(base + path).openConnection();
         try {
@@ -104,19 +104,19 @@ final class Api {
             // Átirányítást nem követünk (a jelszó így nem juthat másik címre), és a szerver
             // hibaszövegét sem jelenítjük meg: csak a kód és egy rövid magyarázat látszik.
             if (code == 401 || code == 403) {
-                throw new IOException("Hibás felhasználónév vagy jelszó (" + code + ").");
+                throw new IOException(S.s(R.string.s_wrong_username_or_password) + code + ").");
             }
             if (code >= 300 && code < 400) {
-                throw new IOException("A szerver átirányított (" + code + "). Ellenőrizd a címet és a HTTP/HTTPS választást.");
+                throw new IOException(S.s(R.string.s_the_server_redirected_the_request) + code + S.s(R.string.s_check_the_address_and_the_http_https_c));
             }
             if (code == 404) {
-                throw new IOException("A cím nem AdGuard Home szerverre mutat, vagy ezt a funkciót nem ismeri (404).");
+                throw new IOException(S.s(R.string.s_the_address_does_not_point_to_an_adgua));
             }
             if (code >= 400) {
                 InputStream err = c.getErrorStream();
                 String detail = code == 400 && path.startsWith("tls/") ? shortError(err) : null;
                 if (err != null) err.close();
-                throw new IOException("A szerver hibát jelzett (" + code + ")."
+                throw new IOException(S.s(R.string.s_the_server_reported_an_error) + code + ")."
                         + (detail == null ? "" : "\n" + detail));
             }
             return readAll(c.getInputStream());
