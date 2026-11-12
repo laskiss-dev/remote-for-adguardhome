@@ -14,7 +14,7 @@ public class DhcpActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        setupPage("DHCP beállítások");
+        setupPage(S.s(R.string.s_dhcp_settings));
         load();
     }
 
@@ -27,30 +27,30 @@ public class DhcpActivity extends BaseActivity {
     private void render(JSONObject st) {
         loaded();
         boolean en = st.optBoolean("enabled", false);
-        LinearLayout s = section("Állapot", en ? null
-                : "A DHCP-szerver ki van kapcsolva. Home Assistant alatt általában a router osztja a címeket, így ez rendben van.");
-        kv(s, "DHCP-szerver", en ? "Bekapcsolva" : "Kikapcsolva");
-        if (!st.optString("interface_name", "").isEmpty()) kv(s, "Hálózati csatoló", st.optString("interface_name", ""));
+        LinearLayout s = section(S.s(R.string.s_status), en ? null
+                : S.s(R.string.s_the_dhcp_server_is_off_under_home_assi));
+        kv(s, S.s(R.string.s_dhcp_server), en ? S.s(R.string.s_on) : S.s(R.string.s_off));
+        if (!st.optString("interface_name", "").isEmpty()) kv(s, S.s(R.string.s_network_interface), st.optString("interface_name", ""));
         JSONObject v4 = st.optJSONObject("v4");
         if (v4 != null && !v4.optString("gateway_ip", "").isEmpty()) {
-            kv(s, "Átjáró", v4.optString("gateway_ip", ""));
-            kv(s, "Alhálózati maszk", v4.optString("subnet_mask", ""));
-            kv(s, "Címtartomány", v4.optString("range_start", "") + " – " + v4.optString("range_end", ""));
+            kv(s, S.s(R.string.s_gateway), v4.optString("gateway_ip", ""));
+            kv(s, S.s(R.string.s_subnet_mask), v4.optString("subnet_mask", ""));
+            kv(s, S.s(R.string.s_address_range), v4.optString("range_start", "") + " – " + v4.optString("range_end", ""));
             long sec = v4.optLong("lease_duration", 0);
-            if (sec > 0) kv(s, "Bérleti idő", sec >= 3600 ? (sec / 3600) + " óra" : sec + " másodperc");
+            if (sec > 0) kv(s, S.s(R.string.s_lease_time), sec >= 3600 ? (sec / 3600) + S.s(R.string.s_hours) : sec + S.s(R.string.s_seconds));
         }
-        TextView note = text("A DHCP beállításait a webes felületen módosíthatod, mert egy rossz beállítás az egész hálózatot érintheti.", 12, MUTED);
+        TextView note = text(S.s(R.string.s_you_can_change_the_dhcp_settings_in_th), 12, MUTED);
         note.setPadding(0, dp(8), 0, 0);
         s.addView(note);
 
-        leases("Kiosztott címek", st.optJSONArray("leases"), true);
-        leases("Statikus címek", st.optJSONArray("static_leases"), false);
+        leases(S.s(R.string.s_leased_addresses), st.optJSONArray("leases"), true);
+        leases(S.s(R.string.s_static_addresses), st.optJSONArray("static_leases"), false);
     }
 
     private void leases(String title, JSONArray a, boolean dynamic) {
         LinearLayout sec = section(title, null);
         if (a == null || a.length() == 0) {
-            emptyNote(sec, "Nincs.");
+            emptyNote(sec, S.s(R.string.s_none));
             return;
         }
         for (int i = 0; i < a.length(); i++) {
@@ -65,7 +65,7 @@ public class DhcpActivity extends BaseActivity {
             c.addView(h);
             c.addView(text(l.optString("ip", "") + " · " + l.optString("mac", ""), 13, SUB));
             if (dynamic && !l.optString("expires", "").isEmpty()) {
-                c.addView(text("Lejár: " + FilterListsActivity.date(l.optString("expires", "")), 12, MUTED));
+                c.addView(text(S.s(R.string.s_expires) + FilterListsActivity.date(l.optString("expires", "")), 12, MUTED));
             }
             sec.addView(c, matchWrap());
         }

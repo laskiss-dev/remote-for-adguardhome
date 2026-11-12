@@ -31,7 +31,7 @@ public class EncryptionActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        setupPage("Titkosítási beállítások");
+        setupPage(S.s(R.string.s_encryption_settings));
         load();
     }
 
@@ -45,72 +45,72 @@ public class EncryptionActivity extends BaseActivity {
         loaded();
         orig = st;
 
-        LinearLayout t = section("Titkosítás",
-                "Titkosítás (HTTPS/QUIC/TLS) támogatása a DNS és a webes admin felület számára.");
-        enabled = switchRow(t, "Titkosítás engedélyezése (HTTPS, DNS-over-HTTPS és DNS-over-TLS)",
-                "Bekapcsolva az admin felület HTTPS-en is működik, a DNS szerver pedig DNS-over-HTTPS-en "
-                        + "és DNS-over-TLS-en is fogadja a kéréseket.",
+        LinearLayout t = section(S.s(R.string.s_encryption),
+                S.s(R.string.s_support_for_encryption_https_quic_tls));
+        enabled = switchRow(t, S.s(R.string.s_enable_encryption_https_dns_over_https),
+                S.s(R.string.s_when_on_the_admin_interface_also_works)
+                        + S.s(R.string.s_and_dns_over_tls),
                 st.optBoolean("enabled", false));
         if (st.has("serve_plain_dns")) {
-            plainDns = switchRow(t, "Egyszerű DNS engedélyezése",
-                    "Alapból be van kapcsolva. Kikapcsolva minden eszköz titkosított DNS-t kénytelen használni; "
-                            + "ehhez legalább egy titkosított DNS protokollnak engedélyezve kell lennie.",
+            plainDns = switchRow(t, S.s(R.string.s_enable_plain_dns),
+                    S.s(R.string.s_on_by_default_when_off_every_device_is)
+                            + S.s(R.string.s_for_that_at_least_one_encrypted_dns_pr),
                     st.optBoolean("serve_plain_dns", true));
         }
 
-        LinearLayout s = section("Szerver és portok", null);
-        serverName = field(s, "Szerver neve", "pl. dns.example.org", st.optString("server_name", ""),
+        LinearLayout s = section(S.s(R.string.s_server_and_ports), null);
+        serverName = field(s, S.s(R.string.s_server_name), S.s(R.string.s_e_g_dns_example_org), st.optString("server_name", ""),
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-        note(s, "Ha meg van adva, az AdGuard Home felismeri a ClientID-ket, válaszol a DDR-lekérdezésekre és további "
-                + "kapcsolatellenőrzéseket végez. Egyeznie kell a tanúsítvány egyik DNS-nevével.");
-        forceHttps = switchRow(s, "Automatikus átirányítás HTTPS kapcsolatra",
-                "Bekapcsolva az AdGuard Home a HTTP kapcsolatokat automatikusan HTTPS-re irányítja.",
+        note(s, S.s(R.string.s_when_set_adguard_home_recognizes_clien)
+                + S.s(R.string.s_it_must_match_one_of_the_dns_names_in));
+        forceHttps = switchRow(s, S.s(R.string.s_redirect_to_https_automatically),
+                S.s(R.string.s_when_on_adguard_home_automatically_red),
                 st.optBoolean("force_https", false));
         portHttps = port(s, "HTTPS port", st.optInt("port_https", 443));
-        note(s, "Ezen a porton érhető el az admin felület HTTPS-en, és itt működik a DNS-over-HTTPS is (/dns-query). 0 = kikapcsolva.");
+        note(s, S.s(R.string.s_the_admin_interface_is_reachable_over));
         portDot = port(s, "DNS-over-TLS port", st.optInt("port_dns_over_tls", 853));
-        note(s, "Ha meg van adva, az AdGuard Home ezen a porton DNS-over-TLS szerverként is fut. 0 = kikapcsolva.");
+        note(s, S.s(R.string.s_when_set_adguard_home_also_runs_as_a_d));
         portDoq = port(s, "DNS-over-QUIC port", st.optInt("port_dns_over_quic", 853));
-        note(s, "Ha meg van adva, az AdGuard Home ezen a porton DNS-over-QUIC szerverként is fut. 0 = kikapcsolva.");
+        note(s, S.s(R.string.s_when_set_adguard_home_also_runs_as_a_d_2));
 
-        LinearLayout c = section("Tanúsítványok",
-                "A titkosításhoz érvényes SSL-tanúsítványlánc kell a domainedhez. Ingyenes tanúsítványt a "
-                        + "letsencrypt.org oldalon kaphatsz, vagy vásárolhatsz egy megbízható kibocsátótól.");
+        LinearLayout c = section(S.s(R.string.s_certificates),
+                S.s(R.string.s_encryption_requires_a_valid_ssl_certif)
+                        + S.s(R.string.s_letsencrypt_org_or_buy_one_from_a_trus));
         String chain = decode(st.optString("certificate_chain", ""));
-        certSource = new Choice(c, "Forrás", new String[]{"Tanúsítványfájl útvonalának megadása", "Tanúsítvány tartalmának megadása"},
+        certSource = new Choice(c, S.s(R.string.s_source), new String[]{S.s(R.string.s_enter_the_path_of_the_certificate_file), S.s(R.string.s_paste_the_certificate_contents)},
                 chain.isEmpty() ? 0 : 1);
-        certPath = field(c, "Tanúsítvány útvonala", "pl. /ssl/fullchain.pem", st.optString("certificate_path", ""),
+        certPath = field(c, S.s(R.string.s_certificate_path), S.s(R.string.s_e_g_ssl_fullchain_pem), st.optString("certificate_path", ""),
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-        certText = area(c, null, "Másold be ide a PEM-kódolt tanúsítványt.", chain, 4);
+        certText = area(c, null, S.s(R.string.s_paste_the_pem_encoded_certificate_here), chain, 4);
         certStatus = col();
         c.addView(certStatus, matchWrap());
         certSource.onChange = this::syncSources;
 
-        LinearLayout k = section("Privát kulcs", null);
+        LinearLayout k = section(S.s(R.string.s_private_key), null);
         keyWasSaved = st.optBoolean("private_key_saved", false);
-        keySource = new Choice(k, "Forrás", new String[]{"Privát kulcsfájl útvonalának beállítása", "Privát kulcs tartalmának megadása"},
+        keySource = new Choice(k, S.s(R.string.s_source), new String[]{S.s(R.string.s_set_the_path_of_the_private_key_file), S.s(R.string.s_paste_the_private_key_contents)},
                 keyWasSaved || !st.optString("private_key", "").isEmpty() ? 1 : 0);
-        keyPath = field(k, "Privát kulcs útvonala", "pl. /ssl/privkey.pem", st.optString("private_key_path", ""),
+        keyPath = field(k, S.s(R.string.s_private_key_path), S.s(R.string.s_e_g_ssl_privkey_pem), st.optString("private_key_path", ""),
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         savedKeyBox = col();
         k.addView(savedKeyBox, matchWrap());
-        useSavedKey = keyWasSaved ? switchRow(savedKeyBox, "Előzőleg mentett kulcs használata",
-                "A szerveren tárolt kulcs marad; nem kell újra bemásolnod.", true) : null;
-        keyText = area(k, null, "Másold be ide a tanúsítványod PEM-kódolt privát kulcsát.", "", 4);
+        useSavedKey = keyWasSaved ? switchRow(savedKeyBox, S.s(R.string.s_use_the_previously_saved_key),
+                S.s(R.string.s_the_key_stored_on_the_server_is_kept_y), true) : null;
+        keyText = area(k, null, S.s(R.string.s_paste_the_pem_encoded_private_key_of_y), "", 4);
         keyStatus = col();
         k.addView(keyStatus, matchWrap());
         keySource.onChange = this::syncSources;
         if (useSavedKey != null) useSavedKey.setOnCheckedChangeListener((v, on) -> syncSources());
 
-        LinearLayout a = section("Ellenőrzés és mentés", null);
+        LinearLayout a = section(S.s(R.string.s_check_and_save), null);
         warning = col();
         a.addView(warning, matchWrap());
         LinearLayout br = buttonRow(a);
-        button(br, "Konfiguráció mentése", 1, v -> saveConfig());
-        button(br, "Ellenőrzés", 0, v -> validate());
-        button(buttonRow(a), "Beállítások visszaállítása", 2, v -> confirm("Beállítások visszaállítása",
-                "Biztosan visszaállítod a titkosítási beállításokat? A titkosítás kikapcsol, a tanúsítvány és a kulcs törlődik.",
-                "Visszaállítás", this::resetConfig));
+        button(br, S.s(R.string.s_save_configuration), 1, v -> saveConfig());
+        button(br, S.s(R.string.s_check), 0, v -> validate());
+        button(buttonRow(a), S.s(R.string.s_reset_settings), 2, v -> confirm(S.s(R.string.s_reset_settings),
+                S.s(R.string.s_are_you_sure_you_want_to_reset_the_enc),
+                S.s(R.string.s_reset), this::resetConfig));
 
         syncSources();
         showStatus(st);
@@ -195,10 +195,10 @@ public class EncryptionActivity extends BaseActivity {
     /** Helyi ellenőrzés a webes felület szabályai szerint; hiba esetén a hibaüzenet, különben null. */
     String localError() {
         int[] ports = {portValue(portHttps), portValue(portDot), portValue(portDoq)};
-        for (int p : ports) if (p < 0 || p > 65535) return "A port 0 és 65535 között lehet.";
-        if (ports[0] > 0 && ports[0] == ports[1]) return "A HTTPS és a DNS-over-TLS port nem egyezhet.";
+        for (int p : ports) if (p < 0 || p > 65535) return S.s(R.string.s_the_port_must_be_between_0_and_65535);
+        if (ports[0] > 0 && ports[0] == ports[1]) return S.s(R.string.s_the_https_and_dns_over_tls_ports_canno);
         if (plainDns != null && !plainDns.isChecked() && !enabled.isChecked()) {
-            return "Az egyszerű DNS letiltásához engedélyezz legalább egy titkosított DNS protokollt.";
+            return S.s(R.string.s_to_disable_plain_dns_enable_at_least_o);
         }
         return null;
     }
@@ -216,7 +216,7 @@ public class EncryptionActivity extends BaseActivity {
         } catch (Exception e) {
             return;
         }
-        setPageStatus("Ellenőrzés…", false);
+        setPageStatus(S.s(R.string.s_checking), false);
         task(() -> new JSONObject(Net.api.post("tls/validate", b)), r -> {
             setPageStatus("", false);
             showStatus(r);
@@ -235,12 +235,12 @@ public class EncryptionActivity extends BaseActivity {
         } catch (Exception e) {
             return;
         }
-        StringBuilder msg = new StringBuilder("Elmented a titkosítási beállításokat?");
+        StringBuilder msg = new StringBuilder(S.s(R.string.s_save_the_encryption_settings));
         String risk = connectionRisk(b);
         if (risk != null) msg.append("\n\n").append(risk);
-        msg.append("\n\nHibás beállítás esetén a webes felület és az app is elérhetetlenné válhat.");
-        confirm("Konfiguráció mentése", msg.toString(), "Mentés", () -> {
-            setPageStatus("Mentés…", false);
+        msg.append(S.s(R.string.s_if_the_settings_are_wrong_both_the_web));
+        confirm(S.s(R.string.s_save_configuration), msg.toString(), S.s(R.string.s_save), () -> {
+            setPageStatus(S.s(R.string.s_saving), false);
             task(() -> {
                 if (b.optBoolean("enabled", false)) {
                     JSONObject v = new JSONObject(Net.api.post("tls/validate", b));
@@ -253,10 +253,10 @@ public class EncryptionActivity extends BaseActivity {
                 boolean ok = (Boolean) res[0];
                 if (!ok) {
                     showStatus((JSONObject) res[1]);
-                    Toast.makeText(this, "A tanúsítvány vagy a kulcs hibás, a beállítás nem mentődött.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, S.s(R.string.s_the_certificate_or_the_key_is_invalid), Toast.LENGTH_LONG).show();
                     return;
                 }
-                Toast.makeText(this, "Titkosítási beállítások mentve", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, S.s(R.string.s_encryption_settings_saved), Toast.LENGTH_SHORT).show();
                 load();
             });
         });
@@ -274,7 +274,7 @@ public class EncryptionActivity extends BaseActivity {
         } catch (Exception e) {
             return;
         }
-        save(() -> Net.api.post("tls/configure", b), "Titkosítási beállítások visszaállítva");
+        save(() -> Net.api.post("tls/configure", b), S.s(R.string.s_encryption_settings_reset));
     }
 
     /** Figyelmeztetés, ha a mentés után az app a jelenlegi címen nem érné el a szervert. */
@@ -284,12 +284,12 @@ public class EncryptionActivity extends BaseActivity {
         boolean en = b.optBoolean("enabled", false);
         int https = b.optInt("port_https", 0);
         if (en && b.optBoolean("force_https", false) && !a.https()) {
-            return "Az app most HTTP-n kapcsolódik. Az átirányítás bekapcsolása után a Szerverek menüben át kell állítanod "
-                    + "HTTPS-re" + (https > 0 ? " és a(z) " + https + " portra" : "") + ", különben nem éri el a szervert.";
+            return S.s(R.string.s_the_app_currently_connects_over_http_a)
+                    + S.s(R.string.s_https) + (https > 0 ? S.s(R.string.s_and_port) + https + S.s(R.string.s_x) : "") + S.s(R.string.s_otherwise_it_cannot_reach_the_server);
         }
         if (a.https() && (!en || https == 0)) {
-            return "Az app most HTTPS-en kapcsolódik. Ha a titkosítás vagy a HTTPS port kikapcsol, a Szerverek menüben "
-                    + "HTTP-re kell váltanod a kapcsolatot.";
+            return S.s(R.string.s_the_app_currently_connects_over_https)
+                    + S.s(R.string.s_switch_the_connection_to_http_in_the_s);
         }
         return null;
     }
@@ -305,15 +305,15 @@ public class EncryptionActivity extends BaseActivity {
         if (hasCert && r.has("valid_chain")) {
             statusTitle(certStatus);
             boolean chain = r.optBoolean("valid_chain", false);
-            certStatus.addView(text(chain ? "✓ A tanúsítványlánc érvényes" : "✗ A tanúsítványlánc érvénytelen", 14,
+            certStatus.addView(text(chain ? S.s(R.string.s_the_certificate_chain_is_valid) : S.s(R.string.s_the_certificate_chain_is_invalid), 14,
                     chain ? OK_TEXT : BAD_TEXT));
             if (r.optBoolean("valid_cert", false)) {
-                if (!r.optString("subject", "").isEmpty()) kv(certStatus, "Tárgy", r.optString("subject", ""));
-                if (!r.optString("issuer", "").isEmpty()) kv(certStatus, "Kibocsátó", r.optString("issuer", ""));
+                if (!r.optString("subject", "").isEmpty()) kv(certStatus, S.s(R.string.s_subject), r.optString("subject", ""));
+                if (!r.optString("issuer", "").isEmpty()) kv(certStatus, S.s(R.string.s_issuer), r.optString("issuer", ""));
                 String na = r.optString("not_after", "");
-                if (!na.isEmpty() && !na.startsWith("0001-")) kv(certStatus, "Lejár", FilterListsActivity.date(na));
+                if (!na.isEmpty() && !na.startsWith("0001-")) kv(certStatus, S.s(R.string.s_expires_2), FilterListsActivity.date(na));
                 JSONArray dn = r.optJSONArray("dns_names");
-                if (dn != null && dn.length() > 0) kv(certStatus, "Hosztnevek", join(dn).replace("\n", ", "));
+                if (dn != null && dn.length() > 0) kv(certStatus, S.s(R.string.s_hostnames), join(dn).replace("\n", ", "));
             }
         }
         boolean hasKey = keySource.sel == 0 ? !keyPath.getText().toString().trim().isEmpty()
@@ -323,20 +323,20 @@ public class EncryptionActivity extends BaseActivity {
             boolean vk = r.optBoolean("valid_key", false);
             String type = r.optString("key_type", "");
             String ty = type.isEmpty() ? "" : type + " ";
-            keyStatus.addView(text(vk ? "✓ Ez egy érvényes " + ty + "privát kulcs" : "✗ Ez egy érvénytelen " + ty + "privát kulcs",
+            keyStatus.addView(text(vk ? S.s(R.string.s_this_is_a_valid) + ty + S.s(R.string.s_private_key_2) : S.s(R.string.s_this_is_an_invalid) + ty + S.s(R.string.s_private_key_2),
                     14, vk ? OK_TEXT : BAD_TEXT));
         }
         String w = r.optString("warning_validation", "");
         if (!w.isEmpty()) {
             boolean ok = validPair(r);
-            TextView tw = text(ok ? "Figyelmeztetés: " + w : w, 14, ok ? MUTED : BAD_TEXT);
+            TextView tw = text(ok ? S.s(R.string.s_warning) + w : w, 14, ok ? MUTED : BAD_TEXT);
             tw.setPadding(0, dp(8), 0, 0);
             warning.addView(tw);
         }
     }
 
     private void statusTitle(LinearLayout parent) {
-        TextView h = text("Állapot", 13, MUTED);
+        TextView h = text(S.s(R.string.s_status), 13, MUTED);
         h.setPadding(0, dp(10), 0, dp(2));
         parent.addView(h);
     }

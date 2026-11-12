@@ -57,7 +57,7 @@ final class Address {
      */
     static Address parse(String input, String defaultScheme) throws Invalid {
         String s = input == null ? "" : input.trim();
-        if (s.isEmpty()) throw new Invalid("Add meg a szerver címét.");
+        if (s.isEmpty()) throw new Invalid(S.s(R.string.s_enter_the_server_address));
         String lower = s.toLowerCase(Locale.ROOT);
         String scheme;
         if (lower.startsWith("http://")) {
@@ -65,7 +65,7 @@ final class Address {
         } else if (lower.startsWith("https://")) {
             scheme = "https";
         } else if (lower.matches("^[a-z][a-z0-9+.-]*://.*")) {
-            throw new Invalid("Csak http:// vagy https:// cím adható meg.");
+            throw new Invalid(S.s(R.string.s_only_http_or_https_addresses_are_allow));
         } else {
             scheme = "https".equals(defaultScheme) ? "https" : "http";
             s = scheme + "://" + s;
@@ -74,29 +74,29 @@ final class Address {
         try {
             u = new URI(s);
         } catch (Exception e) {
-            throw new Invalid("A cím formátuma hibás.");
+            throw new Invalid(S.s(R.string.s_the_address_format_is_invalid));
         }
         if (u.getRawUserInfo() != null) {
-            throw new Invalid("A címben nem lehet felhasználónév vagy jelszó; ezeket a lenti mezőkbe írd.");
+            throw new Invalid(S.s(R.string.s_the_address_cannot_contain_a_username));
         }
         if (u.getRawQuery() != null || u.getRawFragment() != null) {
-            throw new Invalid("A cím nem tartalmazhat ? vagy # utáni részt.");
+            throw new Invalid(S.s(R.string.s_the_address_cannot_contain_a_part_afte));
         }
         String host = u.getHost();
         if (host == null || host.isEmpty()) {
             throw new Invalid(u.getRawAuthority() == null || u.getRawAuthority().isEmpty()
-                    ? "A címből hiányzik a szerver neve vagy IP-címe."
-                    : "A szerver neve, IP-címe vagy portja hibás.");
+                    ? S.s(R.string.s_the_address_is_missing_the_server_name)
+                    : S.s(R.string.s_the_server_name_ip_address_or_port_is));
         }
         if (host.startsWith("[") && host.endsWith("]")) host = host.substring(1, host.length() - 1);
-        if (!validHost(host)) throw new Invalid("A szerver neve vagy IP-címe hibás.");
+        if (!validHost(host)) throw new Invalid(S.s(R.string.s_the_server_name_or_ip_address_is_inval));
         int port = u.getPort();
-        if (port == 0 || port > 65535) throw new Invalid("A port 1 és 65535 között lehet.");
-        if (port < 0 && hasPortSyntax(s)) throw new Invalid("A port 1 és 65535 között lehet.");
+        if (port == 0 || port > 65535) throw new Invalid(S.s(R.string.s_the_port_must_be_between_1_and_65535));
+        if (port < 0 && hasPortSyntax(s)) throw new Invalid(S.s(R.string.s_the_port_must_be_between_1_and_65535));
         String path = u.getRawPath() == null ? "" : u.getRawPath();
         while (path.endsWith("/")) path = path.substring(0, path.length() - 1);
         if (path.endsWith("/control")) path = path.substring(0, path.length() - "/control".length());
-        if (path.contains("..")) throw new Invalid("A cím útvonala hibás.");
+        if (path.contains("..")) throw new Invalid(S.s(R.string.s_the_address_path_is_invalid));
         return new Address(scheme, host.toLowerCase(Locale.ROOT), port, path);
     }
 

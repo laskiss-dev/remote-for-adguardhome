@@ -32,17 +32,17 @@ final class Net {
 
     static String msg(Exception e) {
         if (e instanceof JSONException) {
-            return "A szerver nem a várt választ adta. Ellenőrizd a címet (pl. 192.168.1.10:3000).";
+            return S.s(R.string.s_the_server_did_not_give_the_expected_r);
         }
-        if (e instanceof UnknownHostException) return "A szerver nem található.";
-        if (e instanceof SocketTimeoutException) return "A szerver nem válaszolt időben.";
-        if (e instanceof ConnectException) return "Nem sikerült kapcsolódni a szerverhez.";
+        if (e instanceof UnknownHostException) return S.s(R.string.s_the_server_cannot_be_found);
+        if (e instanceof SocketTimeoutException) return S.s(R.string.s_the_server_did_not_respond_in_time);
+        if (e instanceof ConnectException) return S.s(R.string.s_could_not_connect_to_the_server);
         if (e instanceof javax.net.ssl.SSLHandshakeException) {
-            return "A szerver HTTPS-tanúsítványa nem megbízható, vagy nem ehhez a címhez szól. "
-                    + "Az app ilyenkor biztonsági okból nem kapcsolódik.";
+            return S.s(R.string.s_the_server_s_https_certificate_is_not)
+                    + S.s(R.string.s_for_security_reasons_the_app_does_not);
         }
         if (e instanceof javax.net.ssl.SSLException) {
-            return "Nem sikerült titkosított (HTTPS) kapcsolatot létesíteni. Lehet, hogy a szerver ezen a porton csak HTTP-t használ.";
+            return S.s(R.string.s_could_not_establish_an_encrypted_https);
         }
         String m = e.getMessage();
         return m == null ? e.getClass().getSimpleName() : m;
@@ -89,9 +89,9 @@ final class Net {
                     if (durationMs > 0) throw e;
                     a.post("dns_config", new JSONObject().put("protection_enabled", enabled));
                 }
-                toast(enabled ? "Védelem bekapcsolva" : "Védelem kikapcsolva");
+                toast(enabled ? S.s(R.string.s_protection_on) : S.s(R.string.s_protection_off));
             } catch (Exception e) {
-                toast("Nem sikerült: " + msg(e));
+                toast(S.s(R.string.s_failed) + msg(e));
             }
             loadProtection();
         });

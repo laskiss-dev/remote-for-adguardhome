@@ -34,7 +34,7 @@ public class FilterListsActivity extends BaseActivity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         whitelist = getIntent().getIntExtra("mode", 0) == 1;
-        setupPage(whitelist ? "DNS engedélyezési listák" : "DNS blokkolási listák");
+        setupPage(whitelist ? S.s(R.string.s_dns_allowlists) : S.s(R.string.s_dns_blocklists));
         load();
     }
 
@@ -47,14 +47,14 @@ public class FilterListsActivity extends BaseActivity {
     private void render(JSONObject st) {
         loaded();
         TextView intro = text(whitelist
-                ? "Az engedélyezési listákon szereplő domaineket az AdGuard Home akkor is átengedi, ha egy blokkolási lista blokkolná őket."
-                : "Az AdGuard Home blokkolni fogja azokat a domaineket, amik szerepelnek a blokkolási listán.", 14, MUTED);
+                ? S.s(R.string.s_domains_on_the_allowlists_are_let_thro)
+                : S.s(R.string.s_adguard_home_will_block_the_domains_th), 14, MUTED);
         intro.setPadding(0, dp(8), 0, 0);
         content.addView(intro);
 
         LinearLayout btns = buttonRow(content);
-        button(btns, whitelist ? "Engedélyezési lista hozzáadása" : "Blokkolási lista hozzáadása", 1, v -> addDialog());
-        button(btns, "Frissítések keresése", 0, v -> refreshLists());
+        button(btns, whitelist ? S.s(R.string.s_add_allowlist) : S.s(R.string.s_add_blocklist), 1, v -> addDialog());
+        button(btns, S.s(R.string.s_check_for_updates), 0, v -> refreshLists());
 
         JSONArray lists = st.optJSONArray(whitelist ? "whitelist_filters" : "filters");
         addedUrls.clear();
@@ -64,9 +64,9 @@ public class FilterListsActivity extends BaseActivity {
                 if (f != null) addedUrls.add(f.optString("url", ""));
             }
         }
-        LinearLayout sec = section(whitelist ? "Engedélyezési listák" : "Blokkolási listák", null);
+        LinearLayout sec = section(whitelist ? S.s(R.string.s_allowlists) : S.s(R.string.s_blocklists), null);
         if (lists == null || lists.length() == 0) {
-            emptyNote(sec, "Még nincs lista hozzáadva.");
+            emptyNote(sec, S.s(R.string.s_no_list_added_yet));
             return;
         }
         long sum = 0;
@@ -80,38 +80,38 @@ public class FilterListsActivity extends BaseActivity {
             r.setGravity(Gravity.CENTER_VERTICAL);
             final Switch sw = new Switch(this);
             sw.setChecked(f.optBoolean("enabled", false));
-            sw.setContentDescription(f.optString("name", "") + " bekapcsolva");
+            sw.setContentDescription(f.optString("name", "") + S.s(R.string.s_enabled));
             sw.setOnCheckedChangeListener((v, on) -> setEnabled(f, on));
             r.addView(sw);
             LinearLayout c = col();
             c.setPadding(dp(12), 0, dp(4), 0);
-            TextView name = text(f.optString("name", "(név nélkül)"), 15, TEXT);
+            TextView name = text(f.optString("name", S.s(R.string.s_no_name)), 15, TEXT);
             name.setTypeface(Typeface.DEFAULT_BOLD);
             c.addView(name);
             TextView url = text(f.optString("url", ""), 12, MUTED);
             url.setSingleLine(true);
             url.setEllipsize(TextUtils.TruncateAt.MIDDLE);
             c.addView(url);
-            c.addView(text(fmt(f.optLong("rules_count", 0)) + " szabály · frissítve: "
+            c.addView(text(fmt(f.optLong("rules_count", 0)) + S.s(R.string.s_rules_updated)
                     + date(f.optString("last_updated", "")), 12, SUB));
             r.addView(c, weight(1));
-            r.addView(iconButton(R.drawable.ic_more, "Műveletek", v -> rowMenu(v, f)), new LinearLayout.LayoutParams(dp(44), dp(44)));
+            r.addView(iconButton(R.drawable.ic_more, S.s(R.string.s_actions), v -> rowMenu(v, f)), new LinearLayout.LayoutParams(dp(44), dp(44)));
             sec.addView(r, matchWrap());
         }
-        TextView total = text("Bekapcsolt listák szabályai összesen: " + fmt(sum), 13, MUTED);
+        TextView total = text(S.s(R.string.s_total_rules_in_enabled_lists) + fmt(sum), 13, MUTED);
         total.setPadding(0, dp(10), 0, 0);
         sec.addView(total);
     }
 
     private void rowMenu(android.view.View anchor, final JSONObject f) {
         PopupMenu pm = new PopupMenu(this, anchor);
-        pm.getMenu().add(0, 1, 0, "Szerkesztés");
-        pm.getMenu().add(0, 2, 1, "Törlés");
+        pm.getMenu().add(0, 1, 0, S.s(R.string.s_edit));
+        pm.getMenu().add(0, 2, 1, S.s(R.string.s_delete));
         pm.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == 1) editDialog(f);
-            else confirm("Lista törlése", "Törlöd ezt a listát?\n\n" + f.optString("name", "") + "\n" + f.optString("url", ""),
-                    "Törlés", () -> save(() -> Net.api.post("filtering/remove_url",
-                            new JSONObject().put("url", f.optString("url", "")).put("whitelist", whitelist)), "Lista törölve"));
+            else confirm(S.s(R.string.s_delete_list), S.s(R.string.s_delete_this_list) + f.optString("name", "") + "\n" + f.optString("url", ""),
+                    S.s(R.string.s_delete), () -> save(() -> Net.api.post("filtering/remove_url",
+                            new JSONObject().put("url", f.optString("url", "")).put("whitelist", whitelist)), S.s(R.string.s_list_deleted)));
             return true;
         });
         pm.show();
@@ -132,45 +132,45 @@ public class FilterListsActivity extends BaseActivity {
     private void editDialog(final JSONObject f) {
         LinearLayout form = col();
         form.setPadding(dp(22), dp(8), dp(22), 0);
-        final EditText name = field(form, "Név", "pl. AdGuard DNS filter", f == null ? "" : f.optString("name", ""),
+        final EditText name = field(form, S.s(R.string.s_name), S.s(R.string.s_e_g_adguard_dns_filter), f == null ? "" : f.optString("name", ""),
                 InputType.TYPE_CLASS_TEXT);
-        final EditText url = field(form, "Lista címe (URL) vagy elérési út", "https://…", f == null ? "" : f.optString("url", ""),
+        final EditText url = field(form, S.s(R.string.s_list_address_url_or_file_path), "https://…", f == null ? "" : f.optString("url", ""),
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
         ScrollView sv = new ScrollView(this);
         sv.addView(form);
         final AlertDialog d = new AlertDialog.Builder(this)
-                .setTitle(f == null ? (whitelist ? "Új engedélyezési lista" : "Új blokkolási lista") : "Lista szerkesztése")
+                .setTitle(f == null ? (whitelist ? S.s(R.string.s_new_allowlist) : S.s(R.string.s_new_blocklist)) : S.s(R.string.s_edit_list))
                 .setView(sv)
-                .setPositiveButton("Mentés", null)
-                .setNegativeButton("Mégse", null)
+                .setPositiveButton(S.s(R.string.s_save), null)
+                .setNegativeButton(S.s(R.string.s_cancel), null)
                 .create();
         d.setOnShowListener(x -> d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             final String n = name.getText().toString().trim();
             final String u = url.getText().toString().trim();
             if (u.isEmpty()) {
-                url.setError("Add meg a lista címét");
+                url.setError(S.s(R.string.s_enter_the_list_address));
                 return;
             }
             d.dismiss();
             if (f == null) {
-                setPageStatus("Lista letöltése…", false);
+                setPageStatus(S.s(R.string.s_downloading_list), false);
                 save(() -> Net.api.postSlow("filtering/add_url", new JSONObject()
-                        .put("name", n).put("url", u).put("whitelist", whitelist)), "Lista hozzáadva");
+                        .put("name", n).put("url", u).put("whitelist", whitelist)), S.s(R.string.s_list_added));
             } else {
                 save(() -> Net.api.post("filtering/set_url", new JSONObject()
                         .put("url", f.optString("url", "")).put("whitelist", whitelist)
                         .put("data", new JSONObject().put("name", n).put("url", u)
-                                .put("enabled", f.optBoolean("enabled", true)))), "Lista mentve");
+                                .put("enabled", f.optBoolean("enabled", true)))), S.s(R.string.s_list_saved));
             }
         }));
         d.show();
     }
 
     private void refreshLists() {
-        setPageStatus("Listák frissítése…", false);
+        setPageStatus(S.s(R.string.s_updating_lists), false);
         task(() -> new JSONObject(Net.api.postSlow("filtering/refresh", new JSONObject().put("whitelist", whitelist))),
                 r -> {
-                    toastLong("Frissítve: " + r.optLong("updated", 0) + " lista");
+                    toastLong(S.s(R.string.s_updated) + r.optLong("updated", 0) + S.s(R.string.s_lists));
                     load();
                 });
     }
@@ -186,12 +186,12 @@ public class FilterListsActivity extends BaseActivity {
             return;
         }
         new AlertDialog.Builder(this)
-                .setTitle("Új blokkolási lista")
-                .setItems(new String[]{"Választás a listából", "Egyedi lista hozzáadása"}, (d, w) -> {
+                .setTitle(S.s(R.string.s_new_blocklist))
+                .setItems(new String[]{S.s(R.string.s_choose_from_the_list), S.s(R.string.s_add_custom_list)}, (d, w) -> {
                     if (w == 0) chooseFromRegistry();
                     else editDialog(null);
                 })
-                .setNegativeButton("Mégse", null)
+                .setNegativeButton(S.s(R.string.s_cancel), null)
                 .show();
     }
 
@@ -200,7 +200,7 @@ public class FilterListsActivity extends BaseActivity {
             showRegistry(registry);
             return;
         }
-        setPageStatus("Listák betöltése…", false);
+        setPageStatus(S.s(R.string.s_loading_lists), false);
         Net.NET.execute(() -> {
             try {
                 java.net.HttpURLConnection c = (java.net.HttpURLConnection) new java.net.URL(REGISTRY).openConnection();
@@ -224,7 +224,7 @@ public class FilterListsActivity extends BaseActivity {
             } catch (Exception e) {
                 Net.MAIN.post(() -> {
                     if (isDestroyed()) return;
-                    setPageStatus("⚠ A listagyűjtemény nem tölthető le. Egyedi listát továbbra is felvehetsz.", true);
+                    setPageStatus(S.s(R.string.s_the_list_collection_could_not_be_downl), true);
                 });
             }
         });
@@ -238,20 +238,20 @@ public class FilterListsActivity extends BaseActivity {
 
     static String groupLabel(String name) {
         switch (name.toLowerCase(java.util.Locale.ROOT)) {
-            case "general": return "Általános";
-            case "other": return "Egyéb";
-            case "regional": return "Regionális";
-            case "security": return "Biztonság";
-            default: return name.isEmpty() ? "Listák" : name;
+            case "general": return S.s(R.string.s_general);
+            case "other": return S.s(R.string.s_other);
+            case "regional": return S.s(R.string.s_regional);
+            case "security": return S.s(R.string.s_security);
+            default: return name.isEmpty() ? S.s(R.string.s_lists_2) : name;
         }
     }
 
     static String groupDesc(String name) {
         switch (name.toLowerCase(java.util.Locale.ROOT)) {
-            case "general": return "Olyan listák, amelyek blokkolják a nyomkövetést és a hirdetéseket a legtöbb eszközön.";
-            case "other": return "További blokkolási listák.";
-            case "regional": return "Egy-egy ország vagy nyelv oldalaihoz készült listák.";
-            case "security": return "Kártékony, adathalász és csaló oldalak elleni listák.";
+            case "general": return S.s(R.string.s_lists_that_block_tracking_and_ads_on_m);
+            case "other": return S.s(R.string.s_additional_blocklists);
+            case "regional": return S.s(R.string.s_lists_made_for_the_sites_of_a_specific);
+            case "security": return S.s(R.string.s_lists_against_malicious_phishing_and_s);
             default: return "";
         }
     }
@@ -289,7 +289,7 @@ public class FilterListsActivity extends BaseActivity {
             }
         }
         if (byGroup.isEmpty()) {
-            android.widget.Toast.makeText(this, "A listagyűjtemény üres vagy ismeretlen formátumú.", android.widget.Toast.LENGTH_LONG).show();
+            android.widget.Toast.makeText(this, S.s(R.string.s_the_list_collection_is_empty_or_in_an), android.widget.Toast.LENGTH_LONG).show();
             return;
         }
         // Sorrend: Általános, Egyéb, Regionális, Biztonság, majd a többi
@@ -314,7 +314,7 @@ public class FilterListsActivity extends BaseActivity {
             for (Pick p : l) {
                 android.widget.CheckBox cb = new android.widget.CheckBox(this);
                 boolean have = addedUrls.contains(p.url);
-                cb.setText(have ? p.name + "  (már hozzáadva)" : p.name);
+                cb.setText(have ? p.name + S.s(R.string.s_already_added) : p.name);
                 cb.setTextColor(have ? MUTED : TEXT);
                 cb.setChecked(have);
                 cb.setEnabled(!have);
@@ -335,14 +335,14 @@ public class FilterListsActivity extends BaseActivity {
         ScrollView sv = new ScrollView(this);
         sv.addView(box);
         new AlertDialog.Builder(this)
-                .setTitle("Blokkolási lista választás")
+                .setTitle(S.s(R.string.s_choose_blocklist))
                 .setView(sv)
-                .setPositiveButton("Mentés", (d, w) -> {
+                .setPositiveButton(S.s(R.string.s_save), (d, w) -> {
                     final java.util.ArrayList<Pick> chosen = new java.util.ArrayList<>();
                     for (int i = 0; i < boxes.size(); i++) if (boxes.get(i).isChecked()) chosen.add(picks.get(i));
                     if (!chosen.isEmpty()) addMany(chosen);
                 })
-                .setNegativeButton("Mégse", null)
+                .setNegativeButton(S.s(R.string.s_cancel), null)
                 .show();
     }
 
@@ -354,7 +354,7 @@ public class FilterListsActivity extends BaseActivity {
     }
 
     private void addMany(final java.util.ArrayList<Pick> chosen) {
-        setPageStatus("Listák letöltése (" + chosen.size() + ")…", false);
+        setPageStatus(S.s(R.string.s_downloading_lists) + chosen.size() + ")…", false);
         task(() -> {
             int ok = 0;
             StringBuilder err = new StringBuilder();
@@ -371,19 +371,19 @@ public class FilterListsActivity extends BaseActivity {
         }, res -> {
             int bar = res.indexOf('|');
             String errs = res.substring(bar + 1);
-            android.widget.Toast.makeText(this, "Hozzáadva: " + res.substring(0, bar) + " lista", android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(this, S.s(R.string.s_added) + res.substring(0, bar) + S.s(R.string.s_lists), android.widget.Toast.LENGTH_SHORT).show();
             if (!errs.isEmpty()) {
-                new AlertDialog.Builder(this).setTitle("Néhány lista nem sikerült").setMessage(errs.trim())
-                        .setPositiveButton("Rendben", null).show();
+                new AlertDialog.Builder(this).setTitle(S.s(R.string.s_some_lists_failed)).setMessage(errs.trim())
+                        .setPositiveButton(S.s(R.string.s_ok), null).show();
             }
             load();
         });
     }
 
     static String date(String raw) {
-        if (raw == null || raw.isEmpty()) return "még nem";
+        if (raw == null || raw.isEmpty()) return S.s(R.string.s_not_yet);
         try {
-            return DateTimeFormatter.ofPattern("yyyy. MM. dd. HH:mm")
+            return DateTimeFormatter.ofPattern(S.s(R.string.s_datetime_fmt))
                     .format(OffsetDateTime.parse(raw).atZoneSameInstant(ZoneId.systemDefault()));
         } catch (Exception e) {
             return raw;

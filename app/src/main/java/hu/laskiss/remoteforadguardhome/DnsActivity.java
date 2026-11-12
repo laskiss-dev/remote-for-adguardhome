@@ -16,9 +16,13 @@ import java.util.Iterator;
 public class DnsActivity extends BaseActivity {
 
     static final String[] MODES = {"load_balance", "parallel", "fastest_addr"};
-    static final String[] MODE_LABELS = {"Terheléselosztás", "Párhuzamos kérések", "Leggyorsabb IP-cím"};
+    static String[] MODE_LABELS() {
+        return new String[]{S.s(R.string.s_load_balancing), S.s(R.string.s_parallel_requests), S.s(R.string.s_fastest_ip_address)};
+    }
     static final String[] BLOCK = {"default", "refused", "nxdomain", "null_ip", "custom_ip"};
-    static final String[] BLOCK_LABELS = {"Alapértelmezett", "REFUSED", "NXDOMAIN", "Null IP (0.0.0.0)", "Egyéni IP"};
+    static String[] BLOCK_LABELS() {
+        return new String[]{S.s(R.string.s_default), "REFUSED", "NXDOMAIN", "Null IP (0.0.0.0)", S.s(R.string.s_custom_ip)};
+    }
 
     private JSONObject info;
 
@@ -78,14 +82,14 @@ public class DnsActivity extends BaseActivity {
         }
 
         void saveButton(LinearLayout row) {
-            button(row, "Mentés", 1, v -> {
+            button(row, S.s(R.string.s_save), 1, v -> {
                 final JSONObject body;
                 try {
                     body = collect();
                 } catch (Exception e) {
                     return;
                 }
-                save(() -> Net.api.post("dns_config", body), "DNS beállítások mentve");
+                save(() -> Net.api.post("dns_config", body), S.s(R.string.s_dns_settings_saved));
             });
         }
     }
@@ -93,7 +97,7 @@ public class DnsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        setupPage("DNS beállítások");
+        setupPage(S.s(R.string.s_dns_settings));
         load();
     }
 
@@ -107,51 +111,51 @@ public class DnsActivity extends BaseActivity {
         loaded();
         info = r;
 
-        final Group up = new Group(section("Upstream DNS szerverek",
-                "Soronként egy cím. Domain-specifikus upstream: [/example.local/]192.168.1.1"));
+        final Group up = new Group(section(S.s(R.string.s_upstream_dns_servers),
+                S.s(R.string.s_one_address_per_line_domain_specific_u)));
         up.list("upstream_dns", null, "https://dns10.quad9.net/dns-query", 6);
-        up.choice("upstream_mode", "Lekérdezési mód", MODES, MODE_LABELS, 0);
-        up.number("upstream_timeout", "Upstream időkorlát (másodperc)");
+        up.choice("upstream_mode", S.s(R.string.s_query_mode), MODES, MODE_LABELS(), 0);
+        up.number("upstream_timeout", S.s(R.string.s_upstream_timeout_seconds));
         LinearLayout ub = buttonRow(up.box);
         up.saveButton(ub);
-        button(ub, "Tesztelés", 0, v -> testUpstreams(up));
+        button(ub, S.s(R.string.s_test), 0, v -> testUpstreams(up));
 
-        Group fb = new Group(section("Tartalék DNS szerverek", "Akkor használja, ha az upstreamek nem válaszolnak."));
+        Group fb = new Group(section(S.s(R.string.s_fallback_dns_servers), S.s(R.string.s_used_when_the_upstreams_do_not_respond)));
         fb.list("fallback_dns", null, "pl. 9.9.9.10", 3);
         fb.saveButton(buttonRow(fb.box));
 
-        Group bs = new Group(section("Bootstrap DNS szerverek", "Az upstreamek nevének feloldásához (sima IP-címek)."));
+        Group bs = new Group(section(S.s(R.string.s_bootstrap_dns_servers), S.s(R.string.s_used_to_resolve_the_upstreams_names_pl)));
         bs.list("bootstrap_dns", null, "9.9.9.10", 3);
         bs.saveButton(buttonRow(bs.box));
 
-        Group ptr = new Group(section("Privát fordított DNS", "Helyi IP-címekhez tartozó nevek (PTR) feloldása."));
-        ptr.list("local_ptr_upstreams", null, "pl. 192.168.1.1 (üresen a rendszeré)", 2);
-        ptr.bool("use_private_ptr_resolvers", "Privát fordított feloldók használata", null);
-        ptr.bool("resolve_clients", "Kliensek IP-címeinek feloldása", "Nevet keres a kliensekhez a fordított DNS-sel.");
+        Group ptr = new Group(section(S.s(R.string.s_private_reverse_dns), S.s(R.string.s_resolve_names_ptr_for_local_ip_address)));
+        ptr.list("local_ptr_upstreams", null, S.s(R.string.s_e_g_192_168_1_1_empty_the_system_s), 2);
+        ptr.bool("use_private_ptr_resolvers", S.s(R.string.s_use_private_reverse_resolvers), null);
+        ptr.bool("resolve_clients", S.s(R.string.s_resolve_client_ip_addresses), S.s(R.string.s_looks_up_names_for_clients_using_rever));
         ptr.saveButton(buttonRow(ptr.box));
 
-        Group srv = new Group(section("DNS szerver", null));
-        srv.number("ratelimit", "Lekérdezési korlát (kérés/másodperc kliensenként, 0 = nincs)");
-        srv.list("ratelimit_whitelist", "Korlát alól kivett IP-címek", "soronként", 2);
-        srv.bool("edns_cs_enabled", "EDNS kliens-alhálózat (ECS)", null);
+        Group srv = new Group(section(S.s(R.string.s_dns_server), null));
+        srv.number("ratelimit", S.s(R.string.s_rate_limit_requests_second_per_client));
+        srv.list("ratelimit_whitelist", S.s(R.string.s_ip_addresses_exempt_from_the_limit), S.s(R.string.s_one_per_line), 2);
+        srv.bool("edns_cs_enabled", S.s(R.string.s_edns_client_subnet_ecs), null);
         srv.bool("dnssec_enabled", "DNSSEC", null);
-        srv.bool("disable_ipv6", "IPv6-címek (AAAA) feloldásának tiltása", null);
-        srv.choice("blocking_mode", "Blokkolási mód", BLOCK, BLOCK_LABELS, 0);
-        srv.textField("blocking_ipv4", "Egyéni IPv4-cím (Egyéni IP módhoz)", "pl. 0.0.0.0");
-        srv.textField("blocking_ipv6", "Egyéni IPv6-cím (Egyéni IP módhoz)", "pl. ::");
-        srv.number("blocked_response_ttl", "Blokkolt válasz élettartama (TTL, másodperc)");
+        srv.bool("disable_ipv6", S.s(R.string.s_disable_resolving_ipv6_addresses_aaaa), null);
+        srv.choice("blocking_mode", S.s(R.string.s_blocking_mode), BLOCK, BLOCK_LABELS(), 0);
+        srv.textField("blocking_ipv4", S.s(R.string.s_custom_ipv4_address_for_custom_ip_mode), "pl. 0.0.0.0");
+        srv.textField("blocking_ipv6", S.s(R.string.s_custom_ipv6_address_for_custom_ip_mode), "pl. ::");
+        srv.number("blocked_response_ttl", S.s(R.string.s_blocked_response_lifetime_ttl_seconds));
         srv.saveButton(buttonRow(srv.box));
 
-        Group cache = new Group(section("DNS gyorsítótár", null));
-        cache.bool("cache_enabled", "Gyorsítótár használata", null);
-        cache.number("cache_size", "Gyorsítótár mérete (bájt)");
-        cache.number("cache_ttl_min", "Minimális TTL (másodperc)");
-        cache.number("cache_ttl_max", "Maximális TTL (másodperc, 0 = nincs)");
-        cache.bool("cache_optimistic", "Optimista gyorsítótár", "Lejárt bejegyzést is visszaad, közben frissíti.");
+        Group cache = new Group(section(S.s(R.string.s_dns_cache), null));
+        cache.bool("cache_enabled", S.s(R.string.s_use_cache), null);
+        cache.number("cache_size", S.s(R.string.s_cache_size_bytes));
+        cache.number("cache_ttl_min", S.s(R.string.s_minimum_ttl_seconds));
+        cache.number("cache_ttl_max", S.s(R.string.s_maximum_ttl_seconds_0_none));
+        cache.bool("cache_optimistic", S.s(R.string.s_optimistic_cache), S.s(R.string.s_returns_expired_entries_too_while_refr));
         LinearLayout cb = buttonRow(cache.box);
         cache.saveButton(cb);
-        button(cb, "Gyorsítótár törlése", 2, v -> confirm("Gyorsítótár törlése", "Törlöd a DNS gyorsítótárat?", "Törlés",
-                () -> apply(() -> Net.api.post("cache_clear", null), "Gyorsítótár törölve")));
+        button(cb, S.s(R.string.s_clear_cache), 2, v -> confirm(S.s(R.string.s_clear_cache), S.s(R.string.s_clear_the_dns_cache), S.s(R.string.s_delete),
+                () -> apply(() -> Net.api.post("cache_clear", null), S.s(R.string.s_cache_cleared))));
     }
 
     private void testUpstreams(Group up) {
@@ -166,7 +170,7 @@ public class DnsActivity extends BaseActivity {
         } catch (Exception e) {
             return;
         }
-        setPageStatus("Upstreamek tesztelése…", false);
+        setPageStatus(S.s(R.string.s_testing_upstreams), false);
         task(() -> new JSONObject(Net.api.postSlow("test_upstream_dns", body)), r -> {
             setPageStatus("", false);
             StringBuilder sb = new StringBuilder();
@@ -179,9 +183,9 @@ public class DnsActivity extends BaseActivity {
                 sb.append("\n\n");
             }
             new AlertDialog.Builder(this)
-                    .setTitle("Teszt eredménye")
-                    .setMessage(sb.length() == 0 ? "Nincs mit tesztelni." : sb.toString().trim())
-                    .setPositiveButton("Rendben", null)
+                    .setTitle(S.s(R.string.s_test_result))
+                    .setMessage(sb.length() == 0 ? S.s(R.string.s_nothing_to_test) : sb.toString().trim())
+                    .setPositiveButton(S.s(R.string.s_ok), null)
                     .show();
         });
     }

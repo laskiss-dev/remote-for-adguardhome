@@ -61,10 +61,14 @@ public class MainActivity extends BaseActivity {
 
     static final String[] FILTER_KEYS = {"all", "filtered", "processed", "blocked", "blocked_services",
             "blocked_safebrowsing", "blocked_parental", "whitelisted", "rewritten", "safe_search"};
-    static final String[] FILTER_LABELS = {"Minden kérés", "Megszűrt", "Feldolgozva", "Blokkolva", "Blokkolt szolgáltatások",
-            "Blokkolt fenyegetések", "Szülői felügyelet által blokkolva", "Engedve", "Átírt", "Biztonságos keresés"};
+    static String[] FILTER_LABELS() {
+        return new String[]{S.s(R.string.s_all_requests), S.s(R.string.s_filtered), S.s(R.string.s_processed), S.s(R.string.s_blocked), S.s(R.string.s_blocked_services),
+            S.s(R.string.s_blocked_threats), S.s(R.string.s_blocked_by_parental_control), S.s(R.string.s_allowed), S.s(R.string.s_rewritten), S.s(R.string.s_safe_search_2)};
+    }
     static final int[] INTERVALS = {0, 5, 10, 30, 60};
-    static final String[] INTERVAL_LABELS = {"Kikapcsolva", "5 másodperc", "10 másodperc", "30 másodperc", "1 perc"};
+    static String[] INTERVAL_LABELS() {
+        return new String[]{S.s(R.string.s_off), S.s(R.string.s_5_seconds), S.s(R.string.s_10_seconds), S.s(R.string.s_30_seconds), S.s(R.string.s_1_minute)};
+    }
 
     static final int PAGE = 50;   // első betöltés és görgetéskor
     static final int PEEK = 25;   // frissítéskor ennyi legfrissebbet kér, ebből csak az újak kellenek
@@ -145,7 +149,7 @@ public class MainActivity extends BaseActivity {
         i.removeExtra("filter");
         expandedKey = null;
         if (searchEdit != null) searchEdit.setText(s);
-        if (filterLabel != null) filterLabel.setText(FILTER_LABELS[filterIdx]);
+        if (filterLabel != null) filterLabel.setText(FILTER_LABELS()[filterIdx]);
         startFresh();
         return true;
     }
@@ -209,7 +213,7 @@ public class MainActivity extends BaseActivity {
         final Api a = Net.api;
         final String s = search, f = FILTER_KEYS[filterIdx];
         final boolean needNames = filterNames.isEmpty();
-        setStatus("Betöltés…", false);
+        setStatus(S.s(R.string.s_loading), false);
         NET.execute(() -> {
             try {
                 final HashMap<Integer, String> names = needNames ? loadFilterNames(a) : null;
@@ -360,16 +364,16 @@ public class MainActivity extends BaseActivity {
                 }
                 rules.add(rule);
                 a.post("filtering/set_rules", new JSONObject().put("rules", new JSONArray(rules)));
-                Net.toast((unblock ? "Feloldva: " : "Blokkolva: ") + e.domain);
+                Net.toast((unblock ? S.s(R.string.s_unblocked) : S.s(R.string.s_blocked_2)) + e.domain);
             } catch (Exception ex) {
-                Net.toast("Nem sikerült: " + Net.msg(ex));
+                Net.toast(S.s(R.string.s_failed) + Net.msg(ex));
             }
         });
     }
 
     static HashMap<Integer, String> loadFilterNames(Api a) {
         HashMap<Integer, String> m = new HashMap<>();
-        m.put(0, "Saját szabályok");
+        m.put(0, S.s(R.string.s_custom_rules));
         try {
             JSONObject st = a.getJson("filtering/status");
             for (String k : new String[]{"filters", "whitelist_filters"}) {
@@ -430,8 +434,8 @@ public class MainActivity extends BaseActivity {
     static void okStatus() {
         String now = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         setStatus(interval > 0
-                ? "● Automatikus frissítés: " + (interval < 60 ? interval + " mp" : "1 perc") + " · " + now
-                : "Frissítve: " + now, false);
+                ? S.s(R.string.s_auto_refresh) + (interval < 60 ? interval + " mp" : S.s(R.string.s_1_minute)) + " · " + now
+                : S.s(R.string.s_updated) + now, false);
     }
 
     // ---------------------------------------------------------------- felület
@@ -459,10 +463,10 @@ public class MainActivity extends BaseActivity {
             LinearLayout titleRow = row();
             titleRow.setGravity(Gravity.CENTER);
             titleRow.setPadding(dp(16), dp(20), dp(16), dp(6));
-            TextView title = text("Lekérdezési napló", 30, TEXT);
+            TextView title = text(S.s(R.string.s_query_log), 30, TEXT);
             title.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
             titleRow.addView(title);
-            ImageButton refresh = iconButton(R.drawable.ic_refresh, "Frissítés", v -> manualRefresh());
+            ImageButton refresh = iconButton(R.drawable.ic_refresh, S.s(R.string.s_refresh), v -> manualRefresh());
             refresh.setOnLongClickListener(v -> { startFresh(); return true; });
             refresh.setBackground(box(0, BLUE_BORDER, 2, 8));
             LinearLayout.LayoutParams rl = new LinearLayout.LayoutParams(dp(48), dp(48));
@@ -490,8 +494,8 @@ public class MainActivity extends BaseActivity {
             hg.setCornerRadii(new float[]{hr, hr, hr, hr, 0, 0, 0, 0});
             head.setBackground(hg);
             head.setPadding(dp(20), 0, dp(20), 0);
-            head.addView(headText("Idő"), new LinearLayout.LayoutParams(dp(104), ViewGroup.LayoutParams.WRAP_CONTENT));
-            head.addView(headText("Kérés"));
+            head.addView(headText(S.s(R.string.s_time)), new LinearLayout.LayoutParams(dp(104), ViewGroup.LayoutParams.WRAP_CONTENT));
+            head.addView(headText(S.s(R.string.s_request)));
             LinearLayout.LayoutParams hl = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(52));
             hl.topMargin = dp(22);
             hl.leftMargin = dp(10);
@@ -517,12 +521,12 @@ public class MainActivity extends BaseActivity {
         } else {
             LinearLayout bar = row();
             bar.setPadding(dp(8), dp(6), dp(16), dp(4));
-            bar.addView(iconButton(R.drawable.ic_menu, "Menü", this::showMainMenu), new LinearLayout.LayoutParams(dp(44), dp(44)));
-            TextView title = text("Lekérdezési napló", 22, TEXT);
+            bar.addView(iconButton(R.drawable.ic_menu, S.s(R.string.s_menu), this::showMainMenu), new LinearLayout.LayoutParams(dp(44), dp(44)));
+            TextView title = text(S.s(R.string.s_query_log), 22, TEXT);
             title.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
             title.setSingleLine(true);
             bar.addView(title);
-            ImageButton refresh = iconButton(R.drawable.ic_refresh, "Frissítés", v -> manualRefresh());
+            ImageButton refresh = iconButton(R.drawable.ic_refresh, S.s(R.string.s_refresh), v -> manualRefresh());
             refresh.setOnLongClickListener(v -> { startFresh(); return true; });
             LinearLayout.LayoutParams rl = new LinearLayout.LayoutParams(dp(44), dp(44));
             rl.leftMargin = dp(6);
@@ -544,10 +548,10 @@ public class MainActivity extends BaseActivity {
             LinearLayout head = row();
             head.setBackgroundColor(HEAD);
             head.setPadding(dp(20), 0, dp(8), 0);
-            head.addView(headText("Idő"), new LinearLayout.LayoutParams(dp(116), ViewGroup.LayoutParams.WRAP_CONTENT));
-            head.addView(headText("Kérés"), weight(1.5f));
-            head.addView(headText("Válasz"), weight(1f));
-            head.addView(headText("Kliens"), weight(1f));
+            head.addView(headText(S.s(R.string.s_time)), new LinearLayout.LayoutParams(dp(116), ViewGroup.LayoutParams.WRAP_CONTENT));
+            head.addView(headText(S.s(R.string.s_request)), weight(1.5f));
+            head.addView(headText(S.s(R.string.s_response)), weight(1f));
+            head.addView(headText(S.s(R.string.s_client)), weight(1f));
             head.addView(new View(this), new LinearLayout.LayoutParams(dp(44), 1));
             card.addView(head, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(42)));
             android.widget.FrameLayout area = new android.widget.FrameLayout(this);
@@ -564,7 +568,7 @@ public class MainActivity extends BaseActivity {
 
     /** „Ugrás a tetejére” gomb a jobb alsó sarokban; lejjebb görgetve jelenik meg. */
     private void addToTop(android.widget.FrameLayout area) {
-        toTop = iconButton(R.drawable.ic_arrow_up, "Ugrás a lista tetejére", v -> {
+        toTop = iconButton(R.drawable.ic_arrow_up, S.s(R.string.s_jump_to_top_of_list), v -> {
             list.setSelection(0);
             syncHeader();
             toTop.setVisibility(View.GONE);
@@ -653,7 +657,7 @@ public class MainActivity extends BaseActivity {
         searchEdit.setSingleLine(true);
         searchEdit.setTextColor(TEXT);
         searchEdit.setHintTextColor(HINT);
-        searchEdit.setHint("Domain, kliens IP vagy név");
+        searchEdit.setHint(S.s(R.string.s_domain_client_ip_or_name));
         searchEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP, landscape ? 15 : 16);
         searchEdit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         searchEdit.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
@@ -669,12 +673,12 @@ public class MainActivity extends BaseActivity {
             return false;
         });
         box.addView(searchEdit, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
-        box.addView(iconButton(R.drawable.ic_close, "Keresés törlése", v -> {
+        box.addView(iconButton(R.drawable.ic_close, S.s(R.string.s_clear_search), v -> {
             searchEdit.setText("");
             applySearch("");
         }), new LinearLayout.LayoutParams(dp(40), dp(40)));
         if (withHelp) {
-            box.addView(iconButton(R.drawable.ic_help, "Súgó a kereséshez", v -> showSearchHelp()),
+            box.addView(iconButton(R.drawable.ic_help, S.s(R.string.s_search_help), v -> showSearchHelp()),
                     new LinearLayout.LayoutParams(dp(40), dp(40)));
         }
         return box;
@@ -686,23 +690,23 @@ public class MainActivity extends BaseActivity {
         b.setPadding(dp(14), 0, dp(12), 0);
         b.setClickable(true);
         b.setFocusable(true);
-        b.setContentDescription("Szűrés válasz szerint");
+        b.setContentDescription(S.s(R.string.s_filter_by_response));
         ImageView chev = new ImageView(this);
         chev.setImageResource(R.drawable.ic_chevron);
         chev.setColorFilter(ICON);
         b.addView(chev, new LinearLayout.LayoutParams(dp(18), dp(18)));
-        filterLabel = text(FILTER_LABELS[filterIdx], landscape ? 15 : 16, TEXT);
+        filterLabel = text(FILTER_LABELS()[filterIdx], landscape ? 15 : 16, TEXT);
         filterLabel.setSingleLine(true);
         filterLabel.setEllipsize(TextUtils.TruncateAt.END);
         filterLabel.setPadding(dp(12), 0, 0, 0);
         b.addView(filterLabel, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         b.setOnClickListener(v -> new AlertDialog.Builder(this)
-                .setTitle("Válasz szerinti szűrés")
-                .setSingleChoiceItems(FILTER_LABELS, filterIdx, (d, w) -> {
+                .setTitle(S.s(R.string.s_filter_by_response_2))
+                .setSingleChoiceItems(FILTER_LABELS(), filterIdx, (d, w) -> {
                     d.dismiss();
                     if (w != filterIdx) {
                         filterIdx = w;
-                        filterLabel.setText(FILTER_LABELS[w]);
+                        filterLabel.setText(FILTER_LABELS()[w]);
                         expandedKey = null;
                         startFresh();
                     }
@@ -763,10 +767,10 @@ public class MainActivity extends BaseActivity {
     void updateFooter() {
         if (footer == null) return;
         String t;
-        if (loadingMore) t = "Továbbiak betöltése…";
-        else if (entries.isEmpty()) t = loadedOnce && !busy ? "Nincs találat" : "";
-        else if (more) t = "Továbbiak betöltése";
-        else t = "Nincs több bejegyzés";
+        if (loadingMore) t = S.s(R.string.s_loading_more);
+        else if (entries.isEmpty()) t = loadedOnce && !busy ? S.s(R.string.s_no_results) : "";
+        else if (more) t = S.s(R.string.s_load_more);
+        else t = S.s(R.string.s_no_more_entries);
         footer.setText(t);
     }
 
@@ -781,18 +785,18 @@ public class MainActivity extends BaseActivity {
 
     @Override
     void addMenuItems(Menu m) {
-        m.add(1, 101, 10, "Automatikus frissítés…");
-        MenuItem sub = m.add(1, 102, 11, "Második sor az álló nézetben");
+        m.add(1, 101, 10, S.s(R.string.s_auto_refreshing));
+        MenuItem sub = m.add(1, 102, 11, S.s(R.string.s_second_line_in_portrait_view));
         sub.setCheckable(true);
         sub.setChecked(showSub);
-        MenuItem mk = m.add(1, 104, 12, "Új sorok kiemelése");
+        MenuItem mk = m.add(1, 104, 12, S.s(R.string.s_highlight_new_rows));
         mk.setCheckable(true);
         mk.setChecked(markNew);
-        MenuItem bp = m.add(1, 105, 13, "Hangjelzés zöld soroknál");
+        MenuItem bp = m.add(1, 105, 13, S.s(R.string.s_sound_for_green_rows));
         bp.setCheckable(true);
         bp.setChecked(beepNew);
         bp.setEnabled(markNew);
-        m.add(1, 103, 14, "Teljes újratöltés");
+        m.add(1, 103, 14, S.s(R.string.s_full_reload));
     }
 
     @Override
@@ -823,8 +827,8 @@ public class MainActivity extends BaseActivity {
         int sel = 0;
         for (int i = 0; i < INTERVALS.length; i++) if (INTERVALS[i] == interval) sel = i;
         new AlertDialog.Builder(this)
-                .setTitle("Automatikus frissítés")
-                .setSingleChoiceItems(INTERVAL_LABELS, sel, (d, w) -> {
+                .setTitle(S.s(R.string.s_auto_refresh_2))
+                .setSingleChoiceItems(INTERVAL_LABELS(), sel, (d, w) -> {
                     d.dismiss();
                     interval = INTERVALS[w];
                     prefs.edit().putInt("interval", interval).apply();
@@ -836,41 +840,41 @@ public class MainActivity extends BaseActivity {
 
     private void showSearchHelp() {
         new AlertDialog.Builder(this)
-                .setTitle("Keresés")
-                .setMessage("Kereshetsz domainre, a kliens IP-címére vagy nevére.\n\n"
-                        + "Idézőjelek között pontos egyezést keres: \"192.168.0.103\" csak ezt a klienst mutatja, "
-                        + "idézőjel nélkül a 192.168.0.1 a 192.168.0.10–19 címeket is megtalálja.\n\n"
-                        + "A keresés a szerveren fut, így csak a találatok jönnek át a hálózaton.")
-                .setPositiveButton("Rendben", null)
+                .setTitle(S.s(R.string.s_search))
+                .setMessage(S.s(R.string.s_you_can_search_by_domain_the_client_s)
+                        + S.s(R.string.s_in_quotes_it_looks_for_an_exact_match)
+                        + S.s(R.string.s_without_quotes_192_168_0_1_also_finds)
+                        + S.s(R.string.s_the_search_runs_on_the_server_so_only))
+                .setPositiveButton(S.s(R.string.s_ok), null)
                 .show();
     }
 
     private void confirmRule(Entry e) {
         boolean unblock = e.kind == Entry.BLOCKED;
         new AlertDialog.Builder(this)
-                .setTitle(unblock ? "Feloldás" : "Blokkolás")
-                .setMessage((unblock ? "Feloldod ezt a domaint?\n\n" : "Blokkolod ezt a domaint?\n\n") + e.domain
-                        + "\n\nA szabály a Saját szabályok közé kerül.")
-                .setPositiveButton(unblock ? "Feloldás" : "Blokkolás", (d, w) -> toggleRule(e))
-                .setNegativeButton("Mégse", null)
+                .setTitle(unblock ? S.s(R.string.s_unblock) : S.s(R.string.s_block))
+                .setMessage((unblock ? S.s(R.string.s_unblock_this_domain) : S.s(R.string.s_block_this_domain)) + e.domain
+                        + S.s(R.string.s_the_rule_is_added_to_custom_rules))
+                .setPositiveButton(unblock ? S.s(R.string.s_unblock) : S.s(R.string.s_block), (d, w) -> toggleRule(e))
+                .setNegativeButton(S.s(R.string.s_cancel), null)
                 .show();
     }
 
     private void copyDomain(Entry e) {
         ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("domain", e.domain));
-        Toast.makeText(this, "Másolva: " + e.domain, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, S.s(R.string.s_copied) + e.domain, Toast.LENGTH_SHORT).show();
     }
 
     private void rowMenu(View anchor, Entry e) {
         PopupMenu pm = new PopupMenu(this, anchor);
         Menu m = pm.getMenu();
-        m.add(0, 1, 0, e.kind == Entry.BLOCKED ? "Feloldás" : "Blokkolás");
-        m.add(0, 2, 1, "Csak ez a kliens");
-        m.add(0, 3, 2, "Csak ez a domain");
-        m.add(0, 4, 3, "Domain másolása");
-        if (webDomain(e) != null) m.add(0, 6, 4, "Megnyitás külső böngészőben");
-        m.add(0, 5, 5, "Részletek");
+        m.add(0, 1, 0, e.kind == Entry.BLOCKED ? S.s(R.string.s_unblock) : S.s(R.string.s_block));
+        m.add(0, 2, 1, S.s(R.string.s_only_this_client));
+        m.add(0, 3, 2, S.s(R.string.s_only_this_domain));
+        m.add(0, 4, 3, S.s(R.string.s_copy_domain));
+        if (webDomain(e) != null) m.add(0, 6, 4, S.s(R.string.s_open_in_external_browser));
+        m.add(0, 5, 5, S.s(R.string.s_details));
         pm.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case 1: confirmRule(e); break;
@@ -904,7 +908,7 @@ public class MainActivity extends BaseActivity {
         try {
             startActivity(i);
         } catch (ActivityNotFoundException ex) {
-            Toast.makeText(this, "Nincs böngésző a telefonon.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, S.s(R.string.s_there_is_no_browser_on_the_phone), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -917,9 +921,9 @@ public class MainActivity extends BaseActivity {
         new AlertDialog.Builder(this)
                 .setTitle(e.shown)
                 .setMessage(sb.toString())
-                .setPositiveButton(e.kind == Entry.BLOCKED ? "Feloldás" : "Blokkolás", (d, w) -> confirmRule(e))
-                .setNeutralButton("Csak ez a kliens", (d, w) -> filterClient(e))
-                .setNegativeButton("Bezárás", null)
+                .setPositiveButton(e.kind == Entry.BLOCKED ? S.s(R.string.s_unblock) : S.s(R.string.s_block), (d, w) -> confirmRule(e))
+                .setNeutralButton(S.s(R.string.s_only_this_client), (d, w) -> filterClient(e))
+                .setNegativeButton(S.s(R.string.s_close), null)
                 .show();
     }
 
@@ -944,23 +948,23 @@ public class MainActivity extends BaseActivity {
             case Entry.REWRITTEN:
                 return !e.answer.isEmpty() ? e.answer : listName(e);
             default:
-                return e.cached ? e.elapsed + " · gyorsítótár" : e.elapsed;
+                return e.cached ? e.elapsed + S.s(R.string.s_cached) : e.elapsed;
         }
     }
 
     List<String[]> detailRows(Entry e) {
         ArrayList<String[]> r = new ArrayList<>();
-        r.add(new String[]{"Dátum", e.date + " " + e.time});
-        r.add(new String[]{"Típus", e.type + ", " + e.proto});
-        r.add(new String[]{"Válasz", e.status});
+        r.add(new String[]{S.s(R.string.s_date), e.date + " " + e.time});
+        r.add(new String[]{S.s(R.string.s_type), e.type + ", " + e.proto});
+        r.add(new String[]{S.s(R.string.s_response), e.status});
         String ln = listName(e);
-        if (e.filterId >= 0 && !ln.isEmpty() && !ln.equals(e.ruleText)) r.add(new String[]{"Lista", ln});
-        if (!e.service.isEmpty()) r.add(new String[]{"Szolgáltatás", e.service});
-        if (!e.ruleText.isEmpty()) r.add(new String[]{"Szabály", e.ruleText});
-        if (!e.answer.isEmpty()) r.add(new String[]{"Válasz IP", e.answer});
-        if (!e.elapsed.isEmpty()) r.add(new String[]{"Válaszidő", e.elapsed + (e.cached ? " (gyorsítótárból)" : "")});
+        if (e.filterId >= 0 && !ln.isEmpty() && !ln.equals(e.ruleText)) r.add(new String[]{S.s(R.string.s_list), ln});
+        if (!e.service.isEmpty()) r.add(new String[]{S.s(R.string.s_service), e.service});
+        if (!e.ruleText.isEmpty()) r.add(new String[]{S.s(R.string.s_rule), e.ruleText});
+        if (!e.answer.isEmpty()) r.add(new String[]{S.s(R.string.s_response_ip), e.answer});
+        if (!e.elapsed.isEmpty()) r.add(new String[]{S.s(R.string.s_response_time), e.elapsed + (e.cached ? S.s(R.string.s_from_cache) : "")});
         if (!e.upstream.isEmpty()) r.add(new String[]{"Upstream", e.upstream});
-        r.add(new String[]{"Kliens", e.client + (e.clientName.isEmpty() ? "" : " (" + e.clientName + ")")});
+        r.add(new String[]{S.s(R.string.s_client), e.client + (e.clientName.isEmpty() ? "" : " (" + e.clientName + ")")});
         return r;
     }
 
@@ -1017,7 +1021,7 @@ public class MainActivity extends BaseActivity {
             h.domain.setTextColor(fg);
             if (landscape) {
                 h.date.setText(e.date);
-                h.sub.setText("Típus: " + e.type + ", " + e.proto);
+                h.sub.setText(S.s(R.string.s_type_2) + e.type + ", " + e.proto);
                 h.status.setText(e.status);
                 h.statusSub.setText(detail(e));
                 h.client.setText(e.client);
@@ -1101,7 +1105,7 @@ public class MainActivity extends BaseActivity {
             TextView k = text(r[0], 14, LABEL);
             line.addView(k, new LinearLayout.LayoutParams(dp(92), ViewGroup.LayoutParams.WRAP_CONTENT));
             TextView val = text(r[1], 14, TEXT);
-            if ("Válasz".equals(r[0])) {
+            if (S.s(R.string.s_response).equals(r[0])) {
                 val.setTypeface(Typeface.DEFAULT_BOLD);
                 val.setTextColor(e.kind == Entry.BLOCKED ? BAD_TEXT : e.kind == Entry.PROCESSED ? OK_TEXT : INFO_TEXT);
             }
@@ -1112,15 +1116,15 @@ public class MainActivity extends BaseActivity {
         LinearLayout buttons = row();
         buttons.setPadding(0, dp(10), 0, 0);
         boolean unblock = e.kind == Entry.BLOCKED;
-        TextView act = pillButton(unblock ? "Feloldás" : "Blokkolás", unblock ? BTN_GREEN : BTN_RED, 0);
+        TextView act = pillButton(unblock ? S.s(R.string.s_unblock) : S.s(R.string.s_block), unblock ? BTN_GREEN : BTN_RED, 0);
         act.setOnClickListener(v -> confirmRule(e));
         buttons.addView(act, wrapH(44));
-        TextView only = pillButton("Csak ez a kliens", 0, BTN_LINE);
+        TextView only = pillButton(S.s(R.string.s_only_this_client), 0, BTN_LINE);
         only.setOnClickListener(v -> filterClient(e));
         LinearLayout.LayoutParams ol = wrapH(44);
         ol.leftMargin = dp(8);
         buttons.addView(only, ol);
-        ImageButton copy = iconButton(R.drawable.ic_copy, "Domain másolása", v -> copyDomain(e));
+        ImageButton copy = iconButton(R.drawable.ic_copy, S.s(R.string.s_copy_domain), v -> copyDomain(e));
         copy.setBackground(box(0, BTN_LINE, 1, 8));
         LinearLayout.LayoutParams cl = new LinearLayout.LayoutParams(dp(44), dp(44));
         cl.leftMargin = dp(8);
@@ -1178,7 +1182,7 @@ public class MainActivity extends BaseActivity {
         c4.addView(h.clientSub);
         h.main.addView(c4, weight(1f));
 
-        h.more = iconButton(R.drawable.ic_more, "Műveletek", v -> { if (h.entry != null) rowMenu(v, h.entry); });
+        h.more = iconButton(R.drawable.ic_more, S.s(R.string.s_actions), v -> { if (h.entry != null) rowMenu(v, h.entry); });
         h.main.addView(h.more, new LinearLayout.LayoutParams(dp(44), dp(44)));
 
         root.addView(h.main, matchWrap());
