@@ -31,7 +31,7 @@
     <string name="s_about">"About"</string>
     <string name="s_installed_version">"Installed version: "</string>
     <string name="s_the_app_does_not_download_or_install">". The app does not download or install "</string>
-    <string name="s_updates_you_get_new_versions_from_goog">"updates; you get new versions from Google Play or the GitHub releases page."</string>
+    <string name="s_updates_you_get_new_versions_from_goog">"updates; you get new versions from the GitHub releases page."</string>
     <string name="s_refresh">"Refresh"</string>
     <string name="s_menu">"Menu"</string>
     <string name="s_no_server_selected_you_can_add_one_und">"No server selected. You can add one under Servers in the ☰ menu."</string>
@@ -669,6 +669,6 @@
     <string name="s_date_fmt">"yyyy-MM-dd"</string>
     <string name="s_datetime_fmt">"yyyy-MM-dd HH:mm"</string>
     <string name="s_new_english_language_the_app_follows_th">"New: English language; the app follows the phone's language (Hungarian or English)"</string>
-    <string name="s_the_in_app_updater_and_the_install_perm">"The in-app updater and the install permission were removed; new versions come from Google Play or the GitHub releases page"</string>
+    <string name="s_the_in_app_updater_and_the_install_perm">"The in-app updater and the install permission were removed; new versions come from the GitHub releases page"</string>
     <string name="s_a_privacy_policy_was_added_to_the_repos">"A privacy policy was added to the repository"</string>
 </resources>

@@ -31,7 +31,7 @@
     <string name="s_about">"Névjegy"</string>
     <string name="s_installed_version">"Telepített verzió: "</string>
     <string name="s_the_app_does_not_download_or_install">". Az app nem tölt le és nem telepít "</string>
-    <string name="s_updates_you_get_new_versions_from_goog">"frissítést; az új verziót a Google Play-ről vagy a GitHub kiadások oldaláról kapod."</string>
+    <string name="s_updates_you_get_new_versions_from_goog">"frissítést; az új verziót a GitHub kiadások oldaláról kapod."</string>
     <string name="s_refresh">"Frissítés"</string>
     <string name="s_menu">"Menü"</string>
     <string name="s_no_server_selected_you_can_add_one_und">"Nincs kiválasztott szerver. A ☰ menü Szerverek pontjában adhatsz meg egyet."</string>
@@ -669,6 +669,6 @@
     <string name="s_date_fmt">"yyyy. MM. dd."</string>
     <string name="s_datetime_fmt">"yyyy. MM. dd. HH:mm"</string>
     <string name="s_new_english_language_the_app_follows_th">"Új: angol nyelv; az app a telefon nyelvét követi (magyar vagy angol)"</string>
-    <string name="s_the_in_app_updater_and_the_install_perm">"Az appon belüli frissítő és a telepítési engedély megszűnt; az új verziók a Google Play-ről vagy a GitHub kiadások oldaláról érkeznek"</string>
+    <string name="s_the_in_app_updater_and_the_install_perm">"Az appon belüli frissítő és a telepítési engedély megszűnt; az új verziók a GitHub kiadások oldaláról érkeznek"</string>
     <string name="s_a_privacy_policy_was_added_to_the_repos">"Adatvédelmi nyilatkozat került a tárhelyre"</string>
 </resources>
