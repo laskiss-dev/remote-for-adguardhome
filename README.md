@@ -24,6 +24,12 @@ gradle assembleRelease
 
 A kiadott APK aláírókulcsa nincs a repóban. A GitHub Actions a repó titkos beállításaiból (`RELEASE_KEYSTORE_B64`, `RELEASE_KEYSTORE_PASSWORD`) állítja elő a fordítás idejére. Helyi fordításnál a `RELEASE_KEYSTORE`, `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS` és `RELEASE_KEY_PASSWORD` környezeti változókkal adható meg; ezek nélkül aláíratlan APK készül.
 
+## Adatvédelem / Privacy
+
+Az app nem gyűjt adatot és semmit nem küld a fejlesztőnek. Részletek: [PRIVACY.md](PRIVACY.md).
+
+*The app collects no data and sends nothing to the developer. Details: [PRIVACY.md](PRIVACY.md).*
+
 ## Licenc / License
 
 © 2026 Kiss László
