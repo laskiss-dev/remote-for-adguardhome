@@ -461,14 +461,6 @@
     <string name="s_since_ios_14_and_macos_big_sur_a_dns_o">"Since iOS 14 and macOS Big Sur, a DNS-over-HTTPS or DNS-over-TLS server can be added to the DNS settings "</string>
     <string name="s_with_a_mobileconfig_file_you_can_downl">"with a \".mobileconfig\" file. You can download the file in the AdGuard Home web interface, on the Setup guide page."</string>
     <string name="s_copied">"Copied: "</string>
-    <string name="s_updates_are_installed_from_the_app_aga">"Updates are installed from the app again with the Install button, without a browser"</string>
-    <string name="s_from_android_12_it_updates_without_a_s">"From Android 12 it updates without a separate confirmation dialog, if the phone allows it"</string>
-    <string name="s_automatic_update_checks_run_at_most_on">"Automatic update checks run at most once a day (previously every 6 hours)"</string>
-    <string name="s_update_the_app_no_longer_installs_by_i">"Update: the app no longer installs updates by itself"</string>
-    <string name="s_for_a_new_version_the_download_button">"For a new version the Download button downloads the file in the browser; to install, tap the downloaded file"</string>
-    <string name="s_new_in_app_update_at_startup_it_checks">"New: in-app update – at startup it checks for a new version and, if there is one, asks whether to install it"</string>
-    <string name="s_before_installing_it_checks_that_the_d">"Before installing it checks that the downloaded file is intact and signed with the same key"</string>
-    <string name="s_app_settings_updates_automatic_checkin">"App settings → Updates: automatic checking on/off, Check for updates now"</string>
     <string name="s_the_menu_structure_now_matches_the_adg">"The menu structure now matches the AdGuard Home web interface exactly"</string>
     <string name="s_new_settings_encryption_settings_https">"New: Settings → Encryption settings (HTTPS, DNS-over-HTTPS/TLS/QUIC, certificate and private key, with validation)"</string>
     <string name="s_new_setup_guide_with_the_server_s_dns">"New: Setup guide with the server's DNS addresses and per-device steps (Router, Windows, macOS, Android, iOS, DNS privacy)"</string>
@@ -669,6 +661,6 @@
     <string name="s_date_fmt">"yyyy-MM-dd"</string>
     <string name="s_datetime_fmt">"yyyy-MM-dd HH:mm"</string>
     <string name="s_new_english_language_the_app_follows_th">"New: English language; the app follows the phone's language (Hungarian or English)"</string>
-    <string name="s_the_in_app_updater_and_the_install_perm">"The in-app updater and the install permission were removed; new versions come from the GitHub releases page"</string>
+    <string name="s_the_in_app_updater_and_the_install_perm">"The app does not download or install updates; new versions come from the GitHub releases page"</string>
     <string name="s_a_privacy_policy_was_added_to_the_repos">"A privacy policy was added to the repository"</string>
 </resources>

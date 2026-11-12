@@ -461,14 +461,6 @@
     <string name="s_since_ios_14_and_macos_big_sur_a_dns_o">"iOS 14 és macOS Big Sur óta egy „.mobileconfig” fájllal hozzáadható a DNS-over-HTTPS vagy DNS-over-TLS szerver "</string>
     <string name="s_with_a_mobileconfig_file_you_can_downl">"a DNS-beállításokhoz. A fájlt az AdGuard Home webes felületén, a Beállítási útmutató oldalon töltheted le."</string>
     <string name="s_copied">"Másolva: "</string>
-    <string name="s_updates_are_installed_from_the_app_aga">"A frissítés ismét az appból települ a Telepítés gombbal, böngésző nélkül"</string>
-    <string name="s_from_android_12_it_updates_without_a_s">"Android 12-től külön jóváhagyó ablak nélkül frissül, ha a telefon engedi"</string>
-    <string name="s_automatic_update_checks_run_at_most_on">"Az automatikus frissítéskeresés naponta legfeljebb egyszer fut (eddig 6 óránként)"</string>
-    <string name="s_update_the_app_no_longer_installs_by_i">"Frissítés: az app már nem telepít magától frissítést"</string>
-    <string name="s_for_a_new_version_the_download_button">"Új verziónál a Letöltés gomb a böngészőben tölti le a fájlt; a telepítéshez koppints a letöltött fájlra"</string>
-    <string name="s_new_in_app_update_at_startup_it_checks">"Új: frissítés az appon belül – induláskor megnézi, van-e új verzió, és ha van, megkérdezi, telepítsd-e"</string>
-    <string name="s_before_installing_it_checks_that_the_d">"Telepítés előtt ellenőrzi, hogy a letöltött fájl sértetlen és ugyanazzal a kulccsal van aláírva"</string>
-    <string name="s_app_settings_updates_automatic_checkin">"Alkalmazás beállítások → Frissítések: automatikus keresés ki/be, Frissítés keresése most"</string>
     <string name="s_the_menu_structure_now_matches_the_adg">"A menü felépítése most teljesen megegyezik az AdGuard Home webes felületével"</string>
     <string name="s_new_settings_encryption_settings_https">"Új: Beállítások → Titkosítási beállítások (HTTPS, DNS-over-HTTPS/TLS/QUIC, tanúsítvány és privát kulcs, ellenőrzéssel)"</string>
     <string name="s_new_setup_guide_with_the_server_s_dns">"Új: Beállítási útmutató a szerver DNS-címeivel és eszközönkénti lépésekkel (Router, Windows, macOS, Android, iOS, DNS adatvédelem)"</string>
@@ -669,6 +661,6 @@
     <string name="s_date_fmt">"yyyy. MM. dd."</string>
     <string name="s_datetime_fmt">"yyyy. MM. dd. HH:mm"</string>
     <string name="s_new_english_language_the_app_follows_th">"Új: angol nyelv; az app a telefon nyelvét követi (magyar vagy angol)"</string>
-    <string name="s_the_in_app_updater_and_the_install_perm">"Az appon belüli frissítő és a telepítési engedély megszűnt; az új verziók a GitHub kiadások oldaláról érkeznek"</string>
+    <string name="s_the_in_app_updater_and_the_install_perm">"Az app nem tölt le és nem telepít frissítést; az új verziók a GitHub kiadások oldaláról érkeznek"</string>
     <string name="s_a_privacy_policy_was_added_to_the_repos">"Adatvédelmi nyilatkozat került a tárhelyre"</string>
 </resources>
