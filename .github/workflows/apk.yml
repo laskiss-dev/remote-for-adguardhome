@@ -57,8 +57,8 @@ jobs:
           APK=app/build/outputs/apk/release/Remote-for-AdGuard-Home-$VER.apk
           MSG=$(git log -1 --format=%B | grep -v -e '^Co-Authored-By' -e '^Claude-Session')
           if gh release view "v$VER" >/dev/null 2>&1; then
+            # Meglévő release-nél csak az APK frissül, a leírást nem bántjuk.
             gh release upload "v$VER" "$APK" --clobber
-            gh release edit "v$VER" --notes "$MSG"
           else
             gh release create "v$VER" "$APK" --title "Remote for AdGuard Home $VER" --notes "$MSG" --target "$GITHUB_SHA"
           fi
