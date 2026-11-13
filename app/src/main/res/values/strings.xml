@@ -715,4 +715,5 @@
     <string name="upd_check_now">"Check for updates now"</string>
     <string name="upd_log_1">"New: the app can check for updates in the background and install them from its own GitHub releases, after your confirmation. It can be turned off in App settings."</string>
     <string name="upd_log_2">"The installer checks the file's checksum and that it is signed with the same key as the installed app."</string>
+    <string name="upd_log_3">"Test release to try out the in-app update."</string>
 </resources>

@@ -715,4 +715,5 @@
     <string name="upd_check_now">"Frissítés keresése most"</string>
     <string name="upd_log_1">"Új: az app maga keres frissítést, és a saját GitHub-kiadásaiból a jóváhagyásod után telepíti. Az Alkalmazás beállításokban kikapcsolható."</string>
     <string name="upd_log_2">"Telepítés előtt ellenőrzi a fájl ellenőrzőösszegét és azt, hogy ugyanazzal a kulccsal van aláírva, mint a telepített app."</string>
+    <string name="upd_log_3">"Próbakiadás az appon belüli frissítés kipróbálásához."</string>
 </resources>

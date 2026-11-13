@@ -13,6 +13,8 @@ public class InfoActivity extends BaseActivity {
     /** Változásnapló, a legújabb elöl: verzió, dátum, változások. */
     static String[][] CHANGES() {
         return new String[][]{
+            {"2.6.1", "2026-11-13",
+                    S.s(R.string.upd_log_3)},
             {"2.6.0", "2026-11-13",
                     S.s(R.string.upd_log_1),
                     S.s(R.string.upd_log_2)},
