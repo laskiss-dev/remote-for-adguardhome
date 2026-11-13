@@ -124,6 +124,7 @@ public abstract class BaseActivity extends Activity {
         Net.top = this;
         showProtection();
         Net.loadProtection();
+        Updater.autoCheck(this, prefs);
     }
 
     @Override

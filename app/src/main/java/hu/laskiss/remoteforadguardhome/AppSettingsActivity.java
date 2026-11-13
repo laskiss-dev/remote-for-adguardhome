@@ -45,12 +45,11 @@ public class AppSettingsActivity extends BaseActivity {
             applyKeepAwake();
         });
 
-        String ver = "?";
-        try {
-            ver = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-        } catch (Exception ignored) {
-        }
-        section(S.s(R.string.s_about), S.s(R.string.s_installed_version) + ver + S.s(R.string.s_the_app_does_not_download_or_install)
-                + S.s(R.string.s_updates_you_get_new_versions_from_goog));
+        LinearLayout upd = section(S.s(R.string.upd_section),
+                getString(R.string.upd_section_desc, Updater.currentVersionName(this), Updater.REPO));
+        Switch auto = switchRow(upd, S.s(R.string.upd_auto), S.s(R.string.upd_auto_desc),
+                prefs.getBoolean(Updater.PREF_AUTO, true));
+        auto.setOnCheckedChangeListener((v, on) -> prefs.edit().putBoolean(Updater.PREF_AUTO, on).apply());
+        button(buttonRow(upd), S.s(R.string.upd_check_now), 1, v -> Updater.manualCheck(this, prefs));
     }
 }

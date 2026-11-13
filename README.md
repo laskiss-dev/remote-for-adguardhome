@@ -14,7 +14,9 @@ Független fejlesztés: nem áll kapcsolatban az AdGuard Home fejlesztőivel, az
 
 ## Letöltés / Download
 
-A kész APK a [Releases](../../releases) oldalon található.
+A kész APK a [Releases](../../releases) oldalon található. A 2.6.0-tól az app maga is keres frissítést ezen az oldalon, és a jóváhagyásod után telepíti (az Alkalmazás beállításokban kikapcsolható).
+
+*From 2.6.0 the app can also check this page for updates and install them after your confirmation (can be turned off in App settings).*
 
 ## Fordítás / Building
 

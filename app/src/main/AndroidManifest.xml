@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Frissítés az appon belül: a letöltött új verziót az Android telepítője kéri jóvá. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- A titkosítatlan HTTP-t az Android csak az egész appra tudja engedni, címtartományra nem.
          Ezért a korlátozást az app kódja végzi (Api / Address): HTTP magától csak otthoni
@@ -80,5 +82,10 @@
             android:name=".RulesActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <!-- A csomagtelepítő visszajelzése a frissítésről (csak az app maga küldheti). -->
+        <receiver
+            android:name=".Updater$Result"
+            android:exported="false" />
     </application>
 </manifest>
